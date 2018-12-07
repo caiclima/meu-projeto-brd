@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/WEB-INF/templates/template.xhtml">
+
+	<ui:define name="head">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	</ui:define>
+
+	<ui:define name="body">
+
+		<rich:messages id="messages" errorClass="error" fatalClass="fatal" infoClass="info" warnClass="warn" />
+
+		<!-- crud operations -->
+		<rich:toolbar styleClass="width100 center">
+			<h:panelGrid columns="4">
+				<a4j:commandButton value="#{bundle.Salvar}" styleClass="toolbarButton toolbarButtonSave" rendered="#{dataBaseAlmBB.modoNovo == 'true' and dataBaseAlmBB.modoAtualizacao == 'false'}" action="#{dataBaseAlmBB.salvar}" execute="@form" render="@form" />
+				<a4j:commandButton value="#{bundle.Alterar}" styleClass="toolbarButton toolbarButtonAtualizaLista" rendered="#{dataBaseAlmBB.modoAtualizacao == 'true'}" action="#{dataBaseAlmBB.atualizar}" execute="@form" render="@form" />
+				<a4j:commandButton value="#{bundle.Cancelar}" styleClass="toolbarButton" rendered="#{dataBaseAlmBB.modoAtualizacao == 'true' || dataBaseAlmBB.modoNovo == 'true'}" action="#{dataBaseAlmBB.cancelar}" execute="@form" render="@form" />
+				<a4j:commandButton value="#{bundle.Novo}" styleClass="toolbarButton toolbarButtonNew" rendered="#{dataBaseAlmBB.modoNovo == 'false' and dataBaseAlmBB.modoAtualizacao == 'false'}" action="#{dataBaseAlmBB.novo}" execute="@form" render="@form" />
+				<a4j:commandButton value="#{bundle.Pesquisar}" styleClass="toolbarButton toolbarButtonFind" rendered="#{dataBaseAlmBB.modoNovo == 'false' and dataBaseAlmBB.modoAtualizacao == 'false'}" onclick="$(this).attr('disabled','disabled');" oncomplete="$(this).removeAttr('disabled');" disabled="#{dataBaseAlmBB.modoAtualizacao == 'true'}" action="#{dataBaseAlmBB.pesquisar}" title="#{bundle.Hint_Pesquisar}" execute="@form" render="@form" />
+			</h:panelGrid>
+		</rich:toolbar>
+	
+		<p></p>
+	
+		<!-- form -->	
+		<rich:panel styleClass="formPanel" id="panelComponentes">
+			<h:panelGrid columns="2" styleClass="panelGrid" >
+				<h:outputText styleClass="formLabel" value="#{bundle.LBL_DataBaseAlm}:" />
+				<h:inputText styleClass="formField" value="#{dataBaseAlmBB.entity.nomeDataBaseAlm}" maxlength="40" />
+				
+				<h:outputLabel styleClass="label-output" value="#{bundle.Flag_Enabled} :" />
+				<h:selectOneMenu value="#{dataBaseAlmBB.flagEnabled}">
+					<f:selectItems value="#{dataBaseAlmBB.simNaoList}" />
+					<f:converter converterId="GenericConverter" />
+				</h:selectOneMenu>	
+			</h:panelGrid>
+		</rich:panel>
+
+		<!-- data -->
+		<rich:dataTable 
+			id="mainDataTable" 
+			value="#{dataBaseAlmBB.dados}"
+			var="current" 
+			noDataLabel="#{bundle.Nenhum_Registro}"
+			rows="10"
+			rowClasses="rowOdd, rowEven"
+			rendered="#{! empty dataBaseAlmBB.dados}">
+			
+			<!-- custom columns -->
+			<rich:column styleClass="center" style="width:7%">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.Codigo}" />
+				</f:facet>
+				<h:outputText value="#{current.id}" />
+			</rich:column>
+			
+			<rich:column styleClass="left" style="width:86%">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.LBL_DataBaseAlm}" />
+				</f:facet>
+				<h:outputText value="#{current.nomeDataBaseAlm}" />
+			</rich:column>
+			
+			<!-- action columns -->
+			<rich:column styleClass="center gridActionColumn">
+				<f:facet name="header">
+					<h:outputText styleClass="gridActionLabel" value="#{bundle.Editar}" />
+				</f:facet>
+				<a4j:commandLink action="#{dataBaseAlmBB.editar(current)}"
+					execute="@this" render="@form">
+					<h:graphicImage styleClass="button" library="imagens" name="edit.png" title="#{bundle.Hint_Editar}" />
+				</a4j:commandLink>
+			</rich:column>
+			
+			<rich:column styleClass="center gridActionColumn">
+				<f:facet name="header">
+					<h:outputText styleClass="gridActionLabel" value="#{bundle.Excluir}" />
+				</f:facet>
+				<a4j:commandLink action="#{dataBaseAlmBB.excluir(current)}"
+					execute="@this" render="@form">
+					<h:graphicImage styleClass="button" library="imagens" name="delete.png" title="#{bundle.Hint_Excluir}" />
+				</a4j:commandLink>
+			</rich:column>
+			
+			<!-- footer -->
+			<f:facet name="footer">
+				<rich:dataScroller renderIfSinglePage="false" />
+			</f:facet>
+		</rich:dataTable>
+	</ui:define>
+</ui:composition>

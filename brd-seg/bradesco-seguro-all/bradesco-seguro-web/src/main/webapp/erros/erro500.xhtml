@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:rich="http://richfaces.org/rich">
+
+<f:view locale="pt_br">
+	<h:head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title></title>
+		<ui:insert name="head" />
+	</h:head>
+	<h:body>
+
+		<div id="faixasuperior">
+			<div id="nomesistema">
+				<rich:toolbar>
+					<h:panelGrid columns="2" style="width:800px;"
+						columnClasses="col1_barra, col2_barra">
+						<h:panelGrid columns="2" styleClass="width100"
+							columnClasses="col5_barra_logo, col95_barra_logo">
+							<h:graphicImage library="images" name="bradesco-seguros.jpg" styleClass="assinatura" height="80" />
+						</h:panelGrid>
+					</h:panelGrid>
+				</rich:toolbar>
+			</div>
+		</div>
+		<div style="position: absolute; top: 30%; left: 35%">
+
+
+			<div style="width: 100%; height: 400px;">
+				<p align="center">
+					<h:graphicImage height="80px" width="75px" library="images"
+						name="red-alert-icon.png" alt="Atenção" title="Atenção" />
+					<br /> <br />
+					<h:outputText
+						value="ESTA PÁGINA NÃO EXISTE OU NÃO PODE SER EXIBIDA." />
+					<br /> <br />
+				</p>
+			</div>
+		</div>
+	</h:body>
+</f:view>
+</html>

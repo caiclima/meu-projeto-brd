@@ -1,0 +1,19 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:a4j="http://richfaces.org/a4j">
+	<rich:popupPanel shadowOpacity="0.0" id="modalProcessando" modal="true" width="200"
+		height="100" autosized="false" resizeable="false">
+		<h:panelGroup layout="block" style="padding:10px">
+			<h:panelGrid columns="2" border="0">
+				<h:graphicImage url="/resources/imagens/Processando.gif" />
+				<h:outputText value="Processando..." />
+			</h:panelGrid>
+		</h:panelGroup>
+	</rich:popupPanel>
+	<a4j:status id="processando"
+		onstart="#{rich:component('modalProcessando')}.show()"
+		onstop="#{rich:component('modalProcessando')}.hide()" />
+</ui:composition>

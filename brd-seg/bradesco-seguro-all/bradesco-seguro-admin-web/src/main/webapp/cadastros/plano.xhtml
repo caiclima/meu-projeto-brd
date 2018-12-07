@@ -1,0 +1,724 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/WEB-INF/templates/template.xhtml">
+
+	<ui:define name="head">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	</ui:define>
+
+	<ui:define name="body">
+		<h:panelGrid styleClass="width100">
+			<a4j:jsFunction name="initPage" action="#" execute="@none" />
+
+			<rich:panel id="panelListagemPlanos" header="#{bundle.LBL_listagemPlanos}" styleClass="height100">
+
+				<rich:messages id="messages" errorClass="error" fatalClass="fatal" infoClass="info" warnClass="warn" />
+
+				<rich:toolbar height="30px">
+				
+					
+					
+					<a4j:commandButton value="#{bundle.Novo}"
+						action="#{planoBB.novoRegistro}"
+						styleClass="toolbarButton toolbarButtonNew" execute="@this"
+						render="panelPlano modalPlano" oncomplete="#{rich:component('modalPlano')}.show();" />
+					<a4j:commandButton value="#{bundle.Pesquisar}"
+						action="#{planoBB.pesquisar}" execute="gridFiltros"
+						rendered="#{planoBB.modoNovo == 'false' and planoBB.modoAtualizacao == 'false'}"
+						render="dataTablePlanos"
+						styleClass="toolbarButton toolbarButtonFind" />
+						
+				</rich:toolbar>
+				
+				<div style="height: 5px;" />
+				
+				<h:panelGrid id="gridFiltros" styleClass="width100"
+							 cellspacing="2" cellpadding="2"
+							 columns="4" columnClasses="width10, width40, width10, width40">
+							 
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_produto} :" />
+					<h:selectOneMenu value="#{planoBB.pojoPesquisa.produto}" converter="ProdutoConverter">
+						<f:selectItems value="#{planoBB.produtoSelectItem}" />
+						<f:ajax listener="#{planoBB.changeProdutoPesquisa}" render="panelListagemPlanos" />
+					</h:selectOneMenu>
+					
+					<h:outputLabel rendered="#{planoBB.pojoPesquisa.produto ne null}" styleClass="label-output" value="#{bundle.LBL_tipo_plano} :" />
+					<h:selectOneMenu rendered="#{planoBB.pojoPesquisa.produto ne null}" value="#{planoBB.pojoPesquisa.tipoPlano}" converter="TipoPlanoConverter">
+						<f:selectItems value="#{planoBB.tipoPlanoSelectItem}" />
+					</h:selectOneMenu>
+					
+					<h:outputText rendered="#{planoBB.validacao2}" styleClass="label-output" value="#{bundle.LBL_faixa_etaria} :" />
+					<h:panelGroup rendered="#{planoBB.validacao2}">
+						<h:inputText value="#{planoBB.pojoPesquisa.faixaEtariaInicial}" styleClass="width20" maxlength="20" length="20" />
+						<h:outputText rendered="#{planoBB.validacao2}" styleClass="label-output" value=" a " />
+						<h:inputText value="#{planoBB.pojoPesquisa.faixaEtariaFinal}" styleClass="width20" maxlength="20" length="20" />
+					</h:panelGroup>
+					
+				
+					<h:outputText rendered="#{planoBB.pojoPesquisa.produto ne null}" styleClass="label-output" value="#{bundle.LBL_nome} :" />
+					<h:panelGroup rendered="#{planoBB.pojoPesquisa.produto ne null}" >
+						<h:inputText value="#{planoBB.pojoPesquisa.nome}" styleClass="width100" maxlength="100" />
+					</h:panelGroup>
+					
+					
+					<h:outputText rendered="#{planoBB.pojoPesquisa.produto ne null}" styleClass="label-output" value="#{bundle.LBL_sigla} :" />
+					<h:panelGroup rendered="#{planoBB.pojoPesquisa.produto ne null}" >
+						<h:inputText value="#{planoBB.pojoPesquisa.sigla}" styleClass="width100" maxlength="100" />
+					</h:panelGroup>
+					
+					<h:outputText rendered="#{planoBB.pojoPesquisa.produto ne null}" styleClass="label-output" value="#{bundle.LBL_codigo} :" />
+					<h:panelGroup rendered="#{planoBB.pojoPesquisa.produto ne null}" >
+						<h:inputText value="#{planoBB.pojoPesquisa.codigo}" styleClass="width100" maxlength="100" />
+					</h:panelGroup>
+					
+					<h:outputText rendered="#{planoBB.pojoPesquisa.produto ne null and planoBB.validacao2}" styleClass="label-output" value="#{bundle.LBL_capital_segurado} :" />
+					<h:panelGroup rendered="#{planoBB.pojoPesquisa.produto ne null and planoBB.validacao2}">
+						<h:inputText value="#{planoBB.pojoPesquisa.capitalSegurado}" styleClass="width50" maxlength="50" converter="defaultDecimal" 
+									 onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);" />	
+					</h:panelGroup>
+					
+					<h:outputText rendered="#{planoBB.validacao1}" styleClass="label-output" value="#{bundle.LBL_valor_premio} :" />
+					<h:panelGroup rendered="#{planoBB.validacao1}" >
+						<h:inputText value="#{planoBB.pojoPesquisa.valorPremio}" styleClass="width50" maxlength="50"  converter="defaultDecimal" 
+									 onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);" />			
+					</h:panelGroup>
+					
+					
+					
+					<h:outputText rendered="#{planoBB.validacao2}" styleClass="label-output" value="#{bundle.LBL_valor_titular} :" />
+					<h:panelGroup rendered="#{planoBB.validacao2}" >
+						<h:inputText value="#{planoBB.pojoPesquisa.valorTitular}" styleClass="width50" maxlength="50" length="50"  converter="defaultDecimal"
+									 onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);" />
+										 				
+					</h:panelGroup>
+					<h:outputText rendered="#{planoBB.validacao2}" styleClass="label-output" value="#{bundle.LBL_valor_titular_conjuge} :" />	
+					<h:panelGroup rendered="#{planoBB.validacao2}" >
+						<h:inputText value="#{planoBB.pojoPesquisa.valorTitularConjuge}" styleClass="width50" maxlength="50" length="50"  converter="defaultDecimal"
+									 onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);" />
+					</h:panelGroup>
+					<h:outputText rendered="#{planoBB.validacao2}" styleClass="label-output" value="#{bundle.LBL_valor_por_filho} :"  />
+					<h:panelGroup rendered="#{planoBB.validacao2}" >
+						<h:inputText value="#{planoBB.pojoPesquisa.valorPorFilho}" styleClass="width50" maxlength="50" length="50"  converter="defaultDecimal"
+									 onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);" />
+					</h:panelGroup>
+					
+					
+					
+					<h:outputText rendered="#{planoBB.pojoPesquisa.produto ne null}" styleClass="label-output" value="#{bundle.LBL_data_inicio_vigencia}:" />
+                    <rich:calendar rendered="#{planoBB.pojoPesquisa.produto ne null}" id="selectDataInicioVigencia" value="#{planoBB.pojoPesquisa.dataInicioVigencia}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width100"/>
+                    
+					<h:outputText rendered="#{planoBB.pojoPesquisa.produto ne null}" styleClass="label-output" value="#{bundle.LBL_data_final_vigencia}:" />
+                    <rich:calendar rendered="#{planoBB.pojoPesquisa.produto ne null}" id="selectDataFinalVigencia" value="#{planoBB.pojoPesquisa.dataFinalVigencia}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width100"/>
+                    
+                    <h:outputText styleClass="label-output" value="#{bundle.LBL_ativo} :" />
+					<h:selectOneMenu value="#{planoBB.pojoPesquisa.flagEnabled}">
+						<f:selectItems value="#{planoBB.simNaoList}"/>
+					</h:selectOneMenu>
+							 
+				</h:panelGrid>
+				
+				<div style="height: 5px;" />
+
+				<h:panelGrid styleClass="width100">
+				
+					<rich:dataTable
+						id="dataTablePlanos"
+						columnClasses="width5, width35, width14, width9, width9, width9, width5, width5"
+						styleClass="width100" rows="13" style="width:100%" iterationStatusVar="it"
+						value="#{planoBB.dados}" var="plano">
+
+						<rich:column styleClass="right">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_id_plano}" />
+							</f:facet>
+							<h:outputText value="#{plano.id}" converter="BigIntegerConverter"/>
+						</rich:column>
+
+						<rich:column styleClass="left" sortBy="#{plano.nome}"
+									sortOrder="#{planoBB.getSortOrder('NOME')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_nome}"
+											render="dataTablePlanos"
+											action="#{planoBB.sortBy('NOME')}" />
+							</f:facet>
+							<h:outputText value="#{plano.nome}"/>
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{plano.codigo}"
+									sortOrder="#{planoBB.getSortOrder('CODIGO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_codigo_plano}"
+											render="dataTablePlanos"
+											action="#{planoBB.sortBy('CODIGO')}"/>
+							</f:facet>
+							<h:outputText value="#{plano.codigo}"/>
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{plano.produto.descricao}"
+									sortOrder="#{planoBB.getSortOrder('PRODUTO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_produto}" 
+												render="dataTablePlanos"
+												action="#{planoBB.sortBy('PRODUTO')}"/>
+							</f:facet>
+							<h:outputText value="#{plano.produto.descricao}"/>
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{plano.tipoPlano.nomeTipoPlano}"
+									sortOrder="#{planoBB.getSortOrder('TIPO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_tipo_plano}" 
+												render="dataTablePlanos"
+												action="#{planoBB.sortBy('TIPO')}"/>
+							</f:facet>
+							<h:outputText value="#{plano.tipoPlano.nomeTipoPlano}"/>
+						</rich:column>
+						
+						<rich:column styleClass="left">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.Detalhes}" />	
+							</f:facet>
+							
+							<a4j:commandLink value="#{bundle.LBL_detalhes}" execute="@this" 
+											 render="panelPlanoDetalhes" oncomplete="#{rich:component('modalPlanoDetalhes')}.show();"
+											 action="#{planoBB.carregarDetalhesPlano(plano)}"/>
+											 
+							
+											 
+						</rich:column>
+						
+						
+						<rich:column styleClass="left" sortBy="#{plano.dataInicioVigencia}"
+									sortOrder="#{planoBB.getSortOrder('DATA_INICIO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_data_inicio_vigencia}" 
+												render="dataTablePlanos"
+												action="#{planoBB.sortBy('DATA_INICIO')}"/>
+							</f:facet>
+							<h:outputText value="#{plano.dataInicioVigencia}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+	                        </h:outputText>
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{plano.dataFinalVigencia}"
+										sortOrder="#{planoBB.getSortOrder('DATA_FINAL')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_data_final_vigencia}" 
+										render="dataTablePlanos"
+										action="#{planoBB.sortBy('DATA_FINAL')}"/>
+							</f:facet>
+							<h:outputText value="#{plano.dataFinalVigencia}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+	                        </h:outputText>
+						</rich:column>
+						
+						<rich:column styleClass="left">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_ativo}"/>
+							</f:facet>
+							<h:outputText value="#{plano.flagEnabled}" converter="SimNaoConverter" />
+						</rich:column>
+
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_excluir}" />
+							</f:facet>
+							<a4j:commandLink action="#{planoBB.excluir(plano)}"
+								execute="@this"
+								onclick="if ( confirm( 'Deseja realmente excluir o registro selecionado?' )==false ) {return false;}"
+								render="dataTablePlanos">
+
+								<h:graphicImage library="imagens" name="delete.png"
+									alt="#{bundle.LBL_excluir}" title="#{bundle.LBL_excluir}"
+									styleClass="button" />
+							</a4j:commandLink>
+						</rich:column>
+
+
+						<!-- footer -->
+						<f:facet name="footer">
+							<rich:dataScroller renderIfSinglePage="false" />
+						</f:facet>
+						
+					</rich:dataTable>
+				</h:panelGrid>
+			</rich:panel>
+	</h:panelGrid>
+	<h:form id="planoForm">
+	<rich:popupPanel id="modalPlano" width="820" height="560" modal="true" domElementAttachment="form" resizeable="false">
+		
+		
+		<f:facet name="header">
+            <h:outputText rendered="#{planoBB.entity.id eq null or planoBB.entity.id eq 0}" value="Adicionar" />
+            <h:outputText rendered="#{planoBB.entity ne null and planoBB.entity.id ne null and planoBB.entity.id ne 0}" value="Editar" />
+        </f:facet>
+	        
+        <f:facet name="controls">
+            <h:outputLink value="#" onclick="#{rich:component('modalPlano')}.hide(); return false;">
+            	<h:graphicImage  library="imagens" name="close.png" 
+            					 alt="#{bundle.LBL_fechar}" 
+            					 title="#{bundle.LBL_fechar}"
+								 styleClass="button" >
+				</h:graphicImage>				 
+            </h:outputLink>
+        </f:facet>
+        
+		<rich:messages id="messagesModalPlano" errorClass="error"
+			fatalClass="fatal" infoClass="info" warnClass="warn" />
+			
+			<h:panelGrid id="panelPlano" styleClass="width100">
+			
+				<rich:toolbar height="30px" styleClass="width100">
+				
+						<a4j:commandButton value="#{bundle.Salvar}"
+											action="#{planoBB.salvar}"
+											execute="@form"
+											render="dataTablePlanos panelPlano messagesModalPlano statusRequest" 
+											styleClass="toolbarButton toolbarButtonSave"
+											oncomplete="if (#{planoBB.sucesso}) #{rich:component('modalPlano')}.hide();"
+											rendered="#{planoBB.entity.id eq null or planoBB.entity.id eq 0}" />
+						<a4j:commandButton value="#{bundle.Atualizar}"
+											action="#{planoBB.atualizar}"
+											execute="@form"
+											render="dataTablePlanos panelPlano messagesModalPlano statusRequest" 
+											styleClass="toolbarButton toolbarButtonSave"
+											oncomplete="if (#{planoBB.sucesso}) #{rich:component('modalPlano')}.hide();"
+											rendered="#{planoBB.entity ne null and planoBB.entity.id ne null and planoBB.entity.id ne 0}" />
+
+				</rich:toolbar>
+				
+				<div style="height: 5px;" />
+				
+
+				<rich:panel header="#{bundle.LBL_dados_plano}"
+					styleClass="width100" bodyClass="padding2">
+
+					<h:panelGrid columns="2" columnClasses="width20,width80" styleClass="width100">
+					
+						<h:outputLabel styleClass="label-output" value="#{bundle.LBL_produto} :" />
+						<h:selectOneMenu value="#{planoBB.entity.produto}" converter="ProdutoConverter">
+							<f:selectItems value="#{planoBB.produtoSelectItem}" />
+							<f:ajax listener="#{planoBB.changeProduto}" render="panelPlano" />
+						</h:selectOneMenu>
+						
+						<h:outputLabel rendered="#{planoBB.entity.produto ne null}" styleClass="label-output" value="#{bundle.LBL_tipoPlano} :" />
+						<h:selectOneMenu rendered="#{planoBB.entity.produto ne null}" value="#{planoBB.entity.tipoPlano}" converter="TipoPlanoConverter">
+							<f:selectItems value="#{planoBB.tipoPlanoSelectItem}" />
+							<a4j:ajax event="valueChange" render="coberturaGrid, btnCobertura" listener="#{planoBB.atualizarCobertura}" execute="@this"/>
+						</h:selectOneMenu>
+						
+						<h:outputText rendered="#{planoBB.validacao2}" styleClass="label-output mandatory" value="#{bundle.LBL_faixa_etaria} :" />
+						<h:panelGroup rendered="#{planoBB.validacao2}">
+							<h:inputText value="#{planoBB.entity.faixaEtariaInicial}" onkeypress="return soNumeros();" styleClass="width5" maxlength="3" length="3" />
+							<h:outputText rendered="#{planoBB.validacao2}" styleClass="label-output mandatory" value=" a " />
+							<h:inputText value="#{planoBB.entity.faixaEtariaFinal}" onkeypress="return soNumeros();" styleClass="width5" maxlength="3" length="3" />
+						</h:panelGroup>
+						
+					
+						<h:outputText rendered="#{planoBB.entity.produto ne null}" styleClass="label-output mandatory" value="#{bundle.LBL_codigo} :" />
+						<h:panelGroup rendered="#{planoBB.entity.produto ne null}" >
+							<h:inputHidden value="#{planoBB.entity.id}" converter="BigIntegerConverter"/>
+							<h:inputHidden value="#{planoBB.entity.flagRemoved}"/>
+							<h:inputText value="#{planoBB.entity.codigo}" styleClass="width100" maxlength="100" />
+						</h:panelGroup>
+						
+						<h:outputText rendered="#{planoBB.entity.produto ne null}" styleClass="label-output mandatory" value="#{bundle.LBL_nome} :" />
+						<h:panelGroup rendered="#{planoBB.entity.produto ne null}" >
+							<h:inputText value="#{planoBB.entity.nome}" styleClass="width100" maxlength="50">
+								<f:validateLength maximum="50" minimum="1"/>
+							</h:inputText>
+						</h:panelGroup>
+						
+						
+						<h:outputText rendered="#{planoBB.entity.produto ne null}" styleClass="label-output mandatory" value="#{bundle.LBL_sigla} :" />
+						<h:panelGroup rendered="#{planoBB.entity.produto ne null}" >
+							<h:inputText value="#{planoBB.entity.sigla}" styleClass="width20" maxlength="10" />
+						</h:panelGroup>
+						
+						<h:outputText rendered="#{planoBB.entity.produto ne null and planoBB.validacao2}" styleClass="label-output mandatory" value="#{bundle.LBL_capital_segurado} :" />
+						<h:panelGroup rendered="#{planoBB.entity.produto ne null and planoBB.validacao2}">
+							<h:inputText value="#{planoBB.entity.capitalSegurado}" styleClass="width20" maxlength="11" converter="defaultDecimal"
+										 onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);"/>
+						</h:panelGroup>
+						
+						<h:outputText rendered="#{planoBB.validacao1}" styleClass="label-output mandatory" value="#{bundle.LBL_valor_premio} :" />
+						<h:panelGroup rendered="#{planoBB.validacao1}" >
+							<h:inputText value="#{planoBB.entity.valorPremio}" styleClass="width20" maxlength="11"  converter="defaultDecimal"
+										 onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);"/>
+						</h:panelGroup>
+						
+						<h:outputText rendered="#{planoBB.validacao2}" styleClass="label-output mandatory" value="#{bundle.LBL_valor_titular} :" />
+						<h:panelGroup rendered="#{planoBB.validacao2}" >
+							<h:inputText value="#{planoBB.entity.valorTitular}" styleClass="width20" maxlength="11"  converter="defaultDecimal"
+										 onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);"/>
+						</h:panelGroup>
+						
+						<h:outputText rendered="#{planoBB.validacao2}" styleClass="label-output" value="#{bundle.LBL_valor_titular_conjuge} :" />
+						<h:panelGroup rendered="#{planoBB.validacao2}" >
+							<h:inputText value="#{planoBB.entity.valorTitularConjuge}" styleClass="width20" maxlength="11"  converter="defaultDecimal"
+										 onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);"/>
+						</h:panelGroup>
+						
+						<h:outputText rendered="#{planoBB.validacao2}" styleClass="label-output" value="#{bundle.LBL_valor_por_filho} :" />
+						<h:panelGroup rendered="#{planoBB.validacao2}" >
+							<h:inputText value="#{planoBB.entity.valorPorFilho}" styleClass="width20" maxlength="11"  converter="defaultDecimal"
+										 onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);"/>
+						</h:panelGroup>
+
+						
+						<h:outputText rendered="#{planoBB.entity.produto ne null}" styleClass="label-output mandatory" value="#{bundle.LBL_data_inicio_vigencia}:" />
+	                    <rich:calendar rendered="#{planoBB.entity.produto ne null}" id="selectDataInicioVigencia" value="#{planoBB.entity.dataInicioVigencia}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width100"/>
+	                    
+						<h:outputText rendered="#{planoBB.entity.produto ne null}" styleClass="label-output" value="#{bundle.LBL_data_final_vigencia}:" />
+	                    <rich:calendar rendered="#{planoBB.entity.produto ne null}" id="selectDataFinalVigencia" value="#{planoBB.entity.dataFinalVigencia}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width100"/>
+	                    
+	                    <h:outputText rendered="#{planoBB.entity.produto ne null}" styleClass="label-output" value="#{bundle.LBL_ativo} ?" />	
+						<h:selectBooleanCheckbox rendered="#{planoBB.entity.produto ne null}" value="#{planoBB.entity.flagEnabled}" />
+						
+					</h:panelGrid>
+					
+					<div style="height: 5px;" />
+					
+					<a4j:commandButton value="#{bundle.LBL_adicionar_cobertura}"
+						action="#{planoBB.criarCobertura()}"
+						render="coberturaGrid, grauParentescoSelect" id="btnCobertura"
+						styleClass="toolbarButton toolbarButtonNew" execute="@this"
+						oncomplete="#{rich:component('modalCobertura')}.show();"
+						rendered="#{planoBB.validacao1}" style="visibility:#{planoBB.showCobertura}"/>
+						
+					<div style="height: 5px;" />
+					
+					<h:panelGrid id="coberturaGrid" styleClass="width100" rendered="#{planoBB.validacao1}" style="visibility:#{planoBB.showCobertura}">
+							
+							<rich:dataTable id="dataTableCoberturas"
+											columnClasses="width10, width16, width16, width16, width16, width16, width10"
+											styleClass="width100" value="#{planoBB.entity.coberturaList}" var="cobertura"
+											iterationStatusVar="status">
+					
+								<rich:column styleClass="left" sortBy="#{dependente.grauParentesco.descricao}">
+									<f:facet name="header">
+										<h:outputText value="#{bundle.LBL_grau_parentesco}"/>
+									</f:facet>
+									<h:outputText value="#{cobertura.grauParentesco.descricao}" />
+								</rich:column>
+								
+								<rich:column styleClass="left">
+									<f:facet name="header">
+										<h:outputText value="#{bundle.LBL_valor_transporte_coletivo}"/>
+									</f:facet>
+									<h:outputText value="#{cobertura.valorTransporteColetivo}" converter="defaultDecimal">
+										<f:convertNumber currencyCode="BRL" type="currency" currencySymbol="R$" minFractionDigits="2" maxFractionDigits="2"/>
+									</h:outputText>
+								</rich:column>
+								
+								<rich:column styleClass="left">
+									<f:facet name="header">
+										<h:outputText value="#{bundle.LBL_valor_veic_parti_taxis_pedestres}"/>
+									</f:facet>
+									<h:outputText value="#{cobertura.valorVeiculoParticularTaxisPedestres}"  converter="defaultDecimal">
+										<f:convertNumber currencyCode="BRL" type="currency" currencySymbol="R$" minFractionDigits="2" maxFractionDigits="2"/>
+									</h:outputText>	
+								</rich:column>
+								
+								<rich:column styleClass="left">
+									<f:facet name="header">
+										<h:outputText value="#{bundle.LBL_valor_demais_acidentes}"/>
+									</f:facet>
+									<h:outputText value="#{cobertura.valorDemaisAcidentes}"  converter="defaultDecimal">
+										<f:convertNumber currencyCode="BRL" type="currency" currencySymbol="R$" minFractionDigits="2" maxFractionDigits="2"/>
+									</h:outputText>	
+								</rich:column>
+								
+								<rich:column styleClass="left">
+									<f:facet name="header">
+										<h:outputText value="#{bundle.LBL_valor_DIH_movito_acidente}"/>
+									</f:facet>
+									<h:outputText value="#{cobertura.valorDIHMotivoAcidentes}"  converter="defaultDecimal">
+										<f:convertNumber currencyCode="BRL" type="currency" currencySymbol="R$" minFractionDigits="2" maxFractionDigits="2"/>
+									</h:outputText>	
+								</rich:column>
+								
+								<rich:column styleClass="left">
+									<f:facet name="header">
+										<h:outputText value="#{bundle.LBL_valor_sorteio}"/>
+									</f:facet>
+									<h:outputText value="#{cobertura.valorSorteio}"  converter="defaultDecimal">
+										<f:convertNumber currencyCode="BRL" type="currency" currencySymbol="R$" minFractionDigits="2" maxFractionDigits="2"/>
+									</h:outputText>	
+								</rich:column>
+								
+								<rich:column styleClass="center">
+									<f:facet name="header">
+										<h:outputText value="#{bundle.LBL_excluir}" />
+									</f:facet>
+									<a4j:commandLink action="#{planoBB.excluirCobertura(status.index)}"
+										execute="@form"
+										onclick="if ( confirm( 'Deseja realmente excluir o registro selecionado?' )==false ) {return false;}"
+										render="coberturaGrid">
+										<h:graphicImage library="imagens" name="delete.png"
+											alt="#{bundle.LBL_excluir}" title="#{bundle.LBL_excluir}"
+											styleClass="button" />
+									</a4j:commandLink>
+								</rich:column>
+							
+							</rich:dataTable>
+							
+					</h:panelGrid>
+					
+					<rich:popupPanel id="modalCobertura" width="400" height="400" modal="true" domElementAttachment="form" resizeable="false"
+									 rendered="#{planoBB.validacao1}">
+		
+						<f:facet name="header">
+				            <h:outputText value="#{bundle.LBL_adicionar_cobertura}" />
+				        </f:facet>
+					        
+				        <f:facet name="controls">
+				            <h:outputLink value="#" onclick="#{rich:component('modalCobertura')}.hide();" >
+				            	<h:graphicImage  library="imagens" name="close.png" 
+				            					 alt="#{bundle.LBL_fechar}" 
+				            					 title="#{bundle.LBL_fechar}"
+												 styleClass="button" />
+							<a4j:ajax event="click" listener="#{planoBB.criarCobertura()}" render="modalCobertura"></a4j:ajax>
+				            </h:outputLink>
+				        </f:facet>
+				                      
+							<h:panelGrid id="panelCoberturaCriarEditar" styleClass="width100">
+								
+								<rich:messages id="messagesCobertura" errorClass="error" fatalClass="fatal" infoClass="info" warnClass="warn" />
+							
+								<rich:panel header="Dados Cobertura"
+									styleClass="width100" bodyClass="padding2">
+									
+									<a4j:commandButton value="#{bundle.LBL_salvar}"
+														action="#{planoBB.salvarCobertura()}"
+														execute="@form"
+														render="coberturaGrid planoForm:messagesCobertura panelListagemPlanos 
+																planoForm:panelCoberturaCriarEditar"  
+														styleClass="toolbarButton toolbarButtonSave"
+														oncomplete="if (#{planoBB.coberturaSucesso}) #{rich:component('modalCobertura')}.hide();" />
+				
+									<h:panelGrid columns="2" styleClass="width100">
+									
+										<h:outputLabel styleClass="label-output" value="#{bundle.LBL_grau_parentesco} :" />
+										<h:selectOneMenu value="#{planoBB.cobertura.grauParentesco}" converter="GenericConverter" id="grauParentescoSelect">
+											<f:selectItems value="#{planoBB.grauParentescoSelectItem}" />
+										</h:selectOneMenu>
+											
+										<h:outputLabel value="#{bundle.LBL_valor_transporte_coletivo} :" />
+										<h:inputText value="#{planoBB.cobertura.valorTransporteColetivo}" maxlength="11" converter="defaultDecimal"
+											onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);"/>
+										
+										<h:outputLabel value="#{bundle.LBL_valor_veic_parti_taxis_pedestres} :" />
+										<h:inputText value="#{planoBB.cobertura.valorVeiculoParticularTaxisPedestres}" maxlength="11" converter="defaultDecimal"
+											onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);"/>
+										
+										<h:outputLabel value="#{bundle.LBL_valor_demais_acidentes} :" />
+										<h:inputText value="#{planoBB.cobertura.valorDemaisAcidentes}" maxlength="11" converter="defaultDecimal"
+											onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);"/>
+										
+										<h:outputLabel value="#{bundle.LBL_valor_DIH_movito_acidente} :" />
+										<h:inputText value="#{planoBB.cobertura.valorDIHMotivoAcidentes}" maxlength="11" converter="defaultDecimal"
+											onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);"/>
+										
+										<h:outputLabel value="#{bundle.LBL_valor_sorteio} :" />
+										<h:inputText value="#{planoBB.cobertura.valorSorteio}" maxlength="11" converter="defaultDecimal"
+											onkeypress="mascara(this,mDecimal);" onkeyup="mascara(this,mDecimal);" onkeydown="mascara(this,mDecimal);"/>
+										
+									</h:panelGrid>
+								</rich:panel>
+							</h:panelGrid>
+						</rich:popupPanel>
+					
+				</rich:panel>
+			</h:panelGrid>
+		</rich:popupPanel>
+		
+		
+		<rich:popupPanel id="modalPlanoDetalhes" width="820" height="560" modal="true" domElementAttachment="form" resizeable="false">
+		
+		
+		<f:facet name="header">
+            <h:outputText value="#{bundle.LBL_detalhes_plano}" />
+        </f:facet>
+	        
+        <f:facet name="controls">
+            <h:outputLink value="#" onclick="#{rich:component('modalPlanoDetalhes')}.hide();">
+            	<h:graphicImage  library="imagens" name="close.png" 
+            					 alt="#{bundle.LBL_fechar}" 
+            					 title="#{bundle.LBL_fechar}"
+								 styleClass="button" />
+				<a4j:ajax event="click" listener="#{planoBB.novoRegistro()}" render="modalCobertura"></a4j:ajax>
+            </h:outputLink>
+        </f:facet>
+        
+			<h:panelGrid id="panelPlanoDetalhes" styleClass="width100">			
+				<h:panelGrid rendered="#{planoBB.entity.produto.codigoValidacaoProduto eq 'VALIDACAO_01'}">
+					<h:panelGrid columns="2" columnClasses="width20,width80" styleClass="width100">
+					
+						<h:outputLabel styleClass="label-output mandatory" value="#{bundle.LBL_produto} :" />
+						<h:outputText value="#{planoBB.entity.produto.nome}" />
+						
+						<h:outputLabel styleClass="label-output mandatory" value="#{bundle.LBL_tipoPlano} :" />
+						<h:outputText value="#{planoBB.entity.tipoPlano.nomeTipoPlano}" />
+					
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_codigo} :" />
+						<h:outputText value="#{planoBB.entity.codigo}" />
+						
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_nome} :" />
+						<h:outputText value="#{planoBB.entity.nome}" />
+						
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_sigla} :" />
+						<h:outputText value="#{planoBB.entity.sigla}" />
+						
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_valor_premio} :" />
+						<h:outputText value="#{planoBB.entity.valorPremio}" converter="defaultDecimal">
+							<f:convertNumber currencyCode="BRL" type="currency" currencySymbol="R$" minFractionDigits="2" maxFractionDigits="2"/>
+						</h:outputText>
+						
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_data_inicio_vigencia}:" />
+	                    <h:outputText value="#{planoBB.entity.dataInicioVigencia}" converter="DateConverter" />
+	                    
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_data_final_vigencia}:" />
+	                    <h:outputText value="#{planoBB.entity.dataFinalVigencia}" converter="DateConverter" />
+	                    
+	                    <h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_ativo} ?" />	
+						<h:outputText value="#{planoBB.entity.flagEnabled}" converter="SimNaoConverter" />
+						
+					</h:panelGrid>
+					
+					<div style="height: 5px;" />
+					
+					<h:panelGrid id="coberturaGridPlanoDetalhes" styleClass="width100">
+							
+							<rich:dataTable id="dataTableCoberturasPlanoDetalhes"
+											columnClasses="width15, width15, width15, width15, width15, width15"
+											styleClass="width100" style="width:100%" value="#{planoBB.entity.coberturaList}" var="cobertura"
+											iterationStatusVar="status">
+					
+								<rich:column styleClass="left" sortBy="#{dependente.grauParentesco.descricao}">
+									<f:facet name="header">
+										<h:outputText value="Grau Parentesco"/>
+									</f:facet>
+									<h:outputText value="#{cobertura.grauParentesco.descricao}" />
+								</rich:column>
+								
+								<rich:column styleClass="left">
+									<f:facet name="header">
+										<h:outputText value="#{bundle.LBL_valor_transporte_coletivo}"/>
+									</f:facet>
+									<h:outputText value="#{cobertura.valorTransporteColetivo}"  converter="defaultDecimal">
+										<f:convertNumber currencyCode="BRL" type="currency" currencySymbol="R$" minFractionDigits="2" maxFractionDigits="2"/>
+									</h:outputText>
+								</rich:column>
+								
+								<rich:column styleClass="left">
+									<f:facet name="header">
+										<h:outputText value="#{bundle.LBL_valor_veic_parti_taxis_pedestres}"/>
+									</f:facet>
+									<h:outputText value="#{cobertura.valorVeiculoParticularTaxisPedestres}"  converter="defaultDecimal">
+										<f:convertNumber currencyCode="BRL" type="currency" currencySymbol="R$" minFractionDigits="2" maxFractionDigits="2"/>
+									</h:outputText>	
+								</rich:column>
+								
+								<rich:column styleClass="left">
+									<f:facet name="header">
+										<h:outputText value="#{bundle.LBL_valor_demais_acidentes}"/>
+									</f:facet>
+									<h:outputText value="#{cobertura.valorDemaisAcidentes}"  converter="defaultDecimal">
+										<f:convertNumber currencyCode="BRL" type="currency" currencySymbol="R$" minFractionDigits="2" maxFractionDigits="2"/>
+									</h:outputText>	
+								</rich:column>
+								
+								<rich:column styleClass="left">
+									<f:facet name="header">
+										<h:outputText value="#{bundle.LBL_valor_DIH_movito_acidente}"/>
+									</f:facet>
+									<h:outputText value="#{cobertura.valorDIHMotivoAcidentes}"  converter="defaultDecimal">
+										<f:convertNumber currencyCode="BRL" type="currency" currencySymbol="R$" minFractionDigits="2" maxFractionDigits="2"/>
+									</h:outputText>	
+								</rich:column>
+								
+								<rich:column styleClass="left">
+									<f:facet name="header">
+										<h:outputText value="#{bundle.LBL_valor_sorteio}"/>
+									</f:facet>
+									<h:outputText value="#{cobertura.valorSorteio}"  converter="defaultDecimal">
+										<f:convertNumber currencyCode="BRL" type="currency" currencySymbol="R$" minFractionDigits="2" maxFractionDigits="2"/>
+									</h:outputText>	
+								</rich:column>
+								
+							</rich:dataTable>
+							
+					</h:panelGrid>
+					
+			</h:panelGrid>
+			
+			<h:panelGrid rendered="#{planoBB.entity.produto.codigoValidacaoProduto eq 'VALIDACAO_02'}" styleClass="width100">
+			
+
+					<h:panelGrid columns="2" columnClasses="width20,width80" styleClass="width100">
+					
+						<h:outputLabel styleClass="label-output mandatory" value="#{bundle.LBL_produto} :" />
+						<h:outputText value="#{planoBB.entity.produto.nome}" />
+						
+						<h:outputLabel styleClass="label-output mandatory" value="#{bundle.LBL_tipoPlano} :" />
+						<h:outputText value="#{planoBB.entity.tipoPlano.nomeTipoPlano}" />
+					
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_codigo} :" />
+						<h:outputText value="#{planoBB.entity.codigo}" />
+						
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_nome} :" />
+						<h:outputText value="#{planoBB.entity.nome}" />
+						
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_sigla} :" />
+						<h:outputText value="#{planoBB.entity.sigla}" />
+						
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_sigla} :" />
+						<h:outputText value="#{planoBB.entity.sigla}" />
+						
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_faixa_etaria} :" />
+						<h:panelGroup >
+							<h:outputText value="#{planoBB.entity.faixaEtariaInicial}" styleClass="width20" />
+							<h:outputText styleClass="label-output" value=" a " />
+							<h:outputText value="#{planoBB.entity.faixaEtariaFinal}" styleClass="width20" />
+						</h:panelGroup>
+						
+						<h:outputText styleClass="label-output" value="#{bundle.LBL_valor_titular} :" />
+						<h:outputText value="#{planoBB.entity.valorTitular}" styleClass="width50" converter="defaultDecimal"/>
+											 				
+						<h:outputText styleClass="label-output" value="#{bundle.LBL_valor_titular_conjuge} :" />	
+						<h:outputText value="#{planoBB.entity.valorTitularConjuge}" styleClass="width50"   converter="defaultDecimal"/>
+
+						<h:outputText styleClass="label-output" value="#{bundle.LBL_valor_por_filho} :"  />
+						<h:outputText value="#{planoBB.entity.valorPorFilho}" styleClass="width50" converter="defaultDecimal" />
+
+						
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_capital_segurado} :" />
+						<h:outputText value="#{planoBB.entity.capitalSegurado}"  converter="defaultDecimal"/>
+						
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_data_inicio_vigencia}:" />
+	                    <h:outputText value="#{planoBB.entity.dataInicioVigencia}" converter="DateConverter" />
+	                    
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_data_final_vigencia}:" />
+	                    <h:outputText value="#{planoBB.entity.dataFinalVigencia}" converter="DateConverter" />
+	                    
+	                    <h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_ativo} ?" />	
+						<h:outputText value="#{planoBB.entity.flagEnabled}" converter="SimNaoConverter" />
+						
+					</h:panelGrid>
+
+				</h:panelGrid>	
+			</h:panelGrid>
+		</rich:popupPanel>
+		
+		</h:form>
+	</ui:define>
+</ui:composition>

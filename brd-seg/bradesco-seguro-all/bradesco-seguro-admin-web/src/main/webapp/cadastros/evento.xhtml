@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/WEB-INF/templates/template.xhtml"
+	xmlns:cts="http://br.com.callink/components/customs">
+
+	<ui:define name="head">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	</ui:define>
+
+	<ui:define name="body">
+		<h:panelGrid styleClass="width100">
+			<a4j:jsFunction name="initPage" action="#" execute="@none" />
+
+			<rich:panel id="panelListagemEventos" header="#{bundle.LBL_listagemEventos}" styleClass="height100">
+
+				<rich:messages id="messages" errorClass="error" fatalClass="fatal" infoClass="info" warnClass="warn" />
+
+				<rich:toolbar height="30px">
+				
+					<a4j:commandButton value="#{bundle.Novo}"
+						action="#{eventoBB.novoRegistro}"
+						styleClass="toolbarButton toolbarButtonNew" execute="@this"
+						render="panelEvento" oncomplete="#{rich:component('modalEvento')}.show();" />
+					<a4j:commandButton value="#{bundle.Pesquisar}"
+						action="#{eventoBB.pesquisar}" execute="gridFiltros messages"
+						rendered="#{eventoBB.modoNovo == 'false' and eventoBB.modoAtualizacao == 'false'}"
+						render="dataTableEventos"
+						styleClass="toolbarButton toolbarButtonFind" />
+						
+				</rich:toolbar>
+				
+				<div style="height: 5px;" />
+				
+				<h:panelGrid id="gridFiltros" styleClass="width100"
+							 cellspacing="2" cellpadding="2"
+							 columns="4" columnClasses="width10, width40, width10, width40">
+							 
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_nome} :" />
+					<h:inputText value="#{eventoBB.entity.nomeEvento}" converter="StringConverter" maxlength="100" styleClass="width98" />
+					
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_codPabx} :" />
+					<h:inputText value="#{eventoBB.entity.codigoAspect}"
+						converter="StringConverter" maxlength="20" />
+						
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_idPabx} :" />
+					<h:inputText
+						value="#{eventoBB.entity.idAspect}" maxlength="18"  converter="BigIntegerConverter" />
+						
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_codCliente} :" />
+					<h:inputText value="#{eventoBB.entity.codigoExterno}"
+							converter="StringConverter" maxlength="20" />
+
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_tipoEvento} :" />
+					<h:selectOneMenu value="#{eventoBB.tipoEvento}" converter="TipoEventoConverter" >
+						<f:selectItems value="#{eventoBB.tipoEventoSelectItem}" />
+					</h:selectOneMenu>
+					
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_ehGateway}" />
+					<h:selectOneMenu value="#{eventoBB.entity.flagGateway}">
+						<f:selectItems value="#{eventoBB.simNaoList}" />
+					</h:selectOneMenu>
+					
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_ehVenda}" />
+					<h:selectOneMenu value="#{eventoBB.entity.flagVenda}">
+						<f:selectItems value="#{eventoBB.simNaoList}" />
+					</h:selectOneMenu>
+					
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_ativo}?" />					
+					<h:selectOneMenu value="#{eventoBB.entity.flagEnabled}">
+						<f:selectItems value="#{eventoBB.simNaoList}" />
+					</h:selectOneMenu>	
+					
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_tipoFinalizacao} :" />
+					<h:selectOneMenu value="#{eventoBB.entity.tipoFinalizacao}">
+						<f:selectItem itemLabel="Selecione..." itemValue="" />
+						<f:selectItems value="#{eventoBB.tipoFinalizacaoItens}" var="tipoFinalizacao" 
+										itemLabel="#{tipoFinalizacao}" itemValue="#{tipoFinalizacao.id}" />
+					</h:selectOneMenu>
+					
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_data_cadastro_inicio}" />
+					<rich:calendar datePattern="dd/MM/yyyy" inputSize="13" showFooter="false"
+								   value="#{eventoBB.dataCadastroInicio}" converter="DateConverter"
+								   enableManualInput="true" converterMessage="#{bundle.MSG_data_formato_invalido}" />
+					
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_data_cadastro_fim}" />
+					<rich:calendar datePattern="dd/MM/yyyy" inputSize="13" showFooter="false"
+								   value="#{eventoBB.dataCadastroFim}" converter="DateConverter"
+								   enableManualInput="true" converterMessage="#{bundle.MSG_data_formato_invalido}" />
+
+				</h:panelGrid>
+				
+				<div style="height: 5px;" />
+
+				<h:panelGrid styleClass="width100">
+				
+					<rich:dataTable
+						id="dataTableEventos"
+						columnClasses="width5, width35, width14, width9, width9, width9, width5, width5"
+						styleClass="width100" rows="13" style="width:100%" iterationStatusVar="it"
+						value="#{eventoBB.dados}" var="evento">
+
+						<rich:column styleClass="right" sortBy="#{evento.id}" sortOrder="#{eventoBB.idOrder}">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_idEvento}" />
+							</f:facet>
+							<h:outputText value="#{evento.id}" converter="BigIntegerConverter"/>
+						</rich:column>
+
+						<rich:column styleClass="left" sortBy="#{evento.nomeEvento}"
+							sortOrder="#{eventoBB.nomeOrder}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_nome}"
+									render="dataTableEventos statusRequest"
+									action="#{eventoBB.sortByNome()}" />
+							</f:facet>
+							<h:outputText value="#{evento.nomeEvento}" />
+						</rich:column>
+
+						<rich:column styleClass="left" sortBy="#{evento.tipoEvento.nomeTipoEvento}"
+							sortOrder="#{eventoBB.tipoEventoOrder}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_tipoEvento}"
+									render="dataTableEventos statusRequest"
+									action="#{eventoBB.sortByTipoEvento()}" />
+							</f:facet>
+							<h:outputText value="#{evento.tipoEvento.nomeTipoEvento}" />
+						</rich:column>
+
+						<rich:column styleClass="right" sortBy="#{evento.idAspect}"
+							sortOrder="#{eventoBB.idPABXOrder}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_idPabx}"
+									render="dataTableEventos statusRequest"
+									action="#{eventoBB.sortByIdPABX()}" />
+							</f:facet>
+							<h:outputText value="#{evento.idAspect}" />
+						</rich:column>
+
+						<rich:column styleClass="left" sortBy="#{evento.codigoAspect}"
+							sortOrder="#{eventoBB.codigoPABXOrder}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_codPabx}"
+									render="dataTableEventos"
+									action="#{eventoBB.sortByCodigoPABX()}" />
+							</f:facet>
+							<h:outputText value="#{evento.codigoAspect}" />
+						</rich:column>
+
+						<rich:column styleClass="left" sortBy="#{evento.codigoExterno}"
+							sortOrder="#{eventoBB.codigoClienteOrder}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_codCliente}"
+									render="dataTableEventos"
+									action="#{eventoBB.sortByCodigoCliente()}" />
+							</f:facet>
+							<h:outputText value="#{evento.codigoExterno}" />
+						</rich:column>
+
+						<rich:column styleClass="left">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_ehGateway}" />
+							</f:facet>
+							<h:outputText value="#{evento.flagGateway}" converter="SimNaoConverter" />
+						</rich:column>
+						
+						<rich:column styleClass="left">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_ehVenda}" />
+							</f:facet>
+							<h:outputText value="#{evento.flagVenda}" converter="SimNaoConverter" />
+						</rich:column>
+
+						<rich:column styleClass="left">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_ativo}" />
+							</f:facet>
+							<h:outputText value="#{evento.flagEnabled}" converter="SimNaoConverter" />
+						</rich:column>
+						
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_editar}" />
+							</f:facet>
+							<a4j:commandLink action="#{eventoBB.chamarPopup(evento)}"
+								execute="@this" oncomplete="#{rich:component('modalEvento')}.show();" render="panelEvento">
+
+								<h:graphicImage library="imagens" name="edit.png"
+									alt="#{bundle.LBL_editar}" title="#{bundle.LBL_editar}"
+									styleClass="button" />
+							</a4j:commandLink>
+						</rich:column>
+
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_excluir}" />
+							</f:facet>
+							<a4j:commandLink action="#{eventoBB.excluir(evento)}"
+								execute="@this"
+								onclick="if ( confirm( 'Deseja realmente excluir o registro selecionado?' )==false ) {return false;}"
+								render="dataTableEventos statusRequest">
+
+								<h:graphicImage library="imagens" name="delete.png"
+									alt="#{bundle.LBL_excluir}" title="#{bundle.LBL_excluir}"
+									styleClass="button" />
+							</a4j:commandLink>
+						</rich:column>
+						
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_associarProdutoCampanha}" />
+							</f:facet>
+							<a4j:commandLink action="#{eventoBB.associarProduto(evento)}"
+								execute="@this" render="panelEventoProduto"
+								oncomplete="if(#{facesContext.maximumSeverity == null}) { #{rich:component('modalEventoProduto')}.show(); return false; }">
+
+								<h:graphicImage library="imagens" name="link_edit.png"
+									alt="#{bundle.LBL_associarProdutoCampanha}"
+									title="#{bundle.LBL_associarProdutoCampanha}"
+									styleClass="button" />
+							</a4j:commandLink>
+						</rich:column>
+
+						<!-- footer -->
+						<f:facet name="footer">
+							<rich:dataScroller renderIfSinglePage="false" />
+						</f:facet>
+						
+					</rich:dataTable>
+				</h:panelGrid>
+			</rich:panel>
+	</h:panelGrid>
+	<h:form>
+	
+	
+	<rich:popupPanel id="modalEvento" width="610" height="535" modal="true" domElementAttachment="form" resizeable="false">
+		
+		<f:facet name="header">
+            <h:outputText value="Adicionar/Editar Evento" />
+        </f:facet>
+	        
+        <f:facet name="controls">
+            <h:outputLink value="#" onclick="#{rich:component('modalEvento')}.hide(); return false;">
+            	<h:graphicImage  library="imagens" name="close.png" 
+            					 alt="#{bundle.LBL_fechar}" 
+            					 title="#{bundle.LBL_fechar}"
+								 styleClass="button" />
+            </h:outputLink>
+        </f:facet>
+        
+		<rich:messages id="messagesEvento" errorClass="error"
+			fatalClass="fatal" infoClass="info" warnClass="warn" />
+			
+			<h:panelGrid id="panelEvento" styleClass="width100">
+			
+				<rich:toolbar height="30px" styleClass="width100">
+				
+					<a4j:commandButton value="#{bundle.Salvar}"
+										action="#{eventoBB.salvar}"
+										execute="@form"
+										render="dataTableEventos panelEvento messagesEvento statusRequest" 
+										styleClass="toolbarButton toolbarButtonSave"
+										oncomplete="if (#{eventoBB.sucesso}) #{rich:component('modalEvento')}.hide();" />
+
+				</rich:toolbar>
+				
+				<div style="height: 5px;" />
+
+				<rich:panel header="#{bundle.LBL_dados_evento}"
+					styleClass="width100" bodyClass="padding2">
+
+					<h:panelGrid columns="2" columnClasses="width20,width80" styleClass="width100">
+					
+						<h:outputLabel styleClass="label-output required" value="#{bundle.LBL_nome} :" />
+						<h:panelGroup>
+							<h:inputHidden value="#{eventoBB.entity.id}" converter="BigIntegerConverter"/>
+							<h:inputText value="#{eventoBB.entity.nomeEvento}" styleClass="width100" maxlength="100"/>
+						</h:panelGroup>
+						
+						<h:outputLabel styleClass="label-output" value="#{bundle.LBL_codPabx} :" />
+						<h:inputText value="#{eventoBB.entity.codigoAspect}"
+							converter="StringConverter" styleClass="width100" maxlength="20" />
+							
+						<h:outputLabel styleClass="label-output" value="#{bundle.LBL_idPabxOpcional} :" />
+						<h:inputText
+							value="#{eventoBB.entity.idAspect}" styleClass="width100" maxlength="18"  converter="BigIntegerConverter" />
+							
+						<h:outputLabel styleClass="label-output" value="#{bundle.LBL_codCliente} :" />
+						<h:inputText value="#{eventoBB.entity.codigoExterno}"
+								converter="StringConverter" styleClass="width100" maxlength="20" />
+						
+						<h:outputLabel styleClass="label-output required" value="#{bundle.LBL_tipoEvento} :" />
+						<h:selectOneMenu value="#{eventoBB.entity.tipoEvento}" converter="TipoEventoConverter" styleClass="width100">
+							<f:selectItems value="#{eventoBB.tipoEventoSelectItem}" />
+						</h:selectOneMenu>
+						
+						<h:outputLabel styleClass="label-output required" value="#{bundle.LBL_tipoFinalizacao} :" />
+						<h:selectOneMenu value="#{eventoBB.entity.tipoFinalizacao}" styleClass="width100">
+							<f:selectItem itemLabel="Selecione..." itemValue="" />
+							<f:selectItems value="#{eventoBB.tipoFinalizacaoItens}" var="tipoFinalizacao" 
+											itemLabel="#{tipoFinalizacao}" itemValue="#{tipoFinalizacao.id}" />
+						</h:selectOneMenu>
+
+						<h:outputLabel styleClass="label-output" value="#{bundle.LBL_ehGateway}" />
+						<h:selectOneMenu value="#{eventoBB.entity.flagGateway}" >
+							<f:selectItem itemLabel="Sim" itemValue="#{true}" />
+							<f:selectItem itemLabel="Não" itemValue="#{false}" />
+						</h:selectOneMenu>
+						
+						<h:outputLabel styleClass="label-output" value="#{bundle.LBL_ehVenda}" />
+						<h:selectOneMenu value="#{eventoBB.entity.flagVenda}" >
+							<f:selectItem itemLabel="Sim" itemValue="#{true}" />
+							<f:selectItem itemLabel="Não" itemValue="#{false}" />
+						</h:selectOneMenu>
+						
+						<h:outputLabel styleClass="label-output" value="#{bundle.LBL_ativo}" />
+						<h:selectOneMenu value="#{eventoBB.entity.flagEnabled}" >
+							<f:selectItem itemLabel="Sim" itemValue="#{true}" />
+							<f:selectItem itemLabel="Não" itemValue="#{false}" />
+						</h:selectOneMenu>
+						
+						<h:outputLabel styleClass="label-output" value="#{bundle.LBL_descricao} :" />
+						<h:inputTextarea value="#{eventoBB.entity.descricao}" styleClass="width100" rows="5" onkeyup="if(this.value.length > 1000){this.value = this.value.substring(0, 1000)};">
+							<f:validateLength maximum="1000"></f:validateLength>
+						</h:inputTextarea>
+						
+					</h:panelGrid>
+				</rich:panel>
+			</h:panelGrid>
+		</rich:popupPanel>
+		</h:form>
+		
+	<rich:popupPanel id="modalEventoProduto" width="655" height="500" modal="true">
+	
+		<f:facet name="header">
+            <h:outputText value="Produtos(s) Associado(s) a Evento" />
+        </f:facet>
+        
+        <f:facet name="controls">
+            <h:outputLink value="#" onclick="#{rich:component('modalEventoProduto')}.hide();">
+            	<h:graphicImage  library="imagens" name="close.png" 
+            					 alt="#{bundle.LBL_fechar}" 
+            					 title="#{bundle.LBL_fechar}"
+								 styleClass="button" />
+				<a4j:ajax event="click" listener="#{eventoBB.limparDadosAssociacao()}"></a4j:ajax>
+            </h:outputLink>
+        </f:facet>
+		<h:form id="formAssociacaoEventoProduto">
+
+			<rich:messages id="messageEventoProduto" errorClass="error"
+				fatalClass="fatal" infoClass="info" warnClass="warn" />
+
+			<h:panelGrid id="panelEventoProduto" styleClass="width100">
+				<rich:toolbar height="30px" styleClass="width100">
+					<a4j:commandButton value="#{bundle.LBL_pesquisar}"
+						render="dataTableProdutos"
+						action="#{eventoBB.carregarAssociacoes()}"
+						styleClass="toolbarButton toolbarButtonFind" />
+					
+					<a4j:commandButton value="#{bundle.LBL_salvar}"
+						action="#{eventoBB.associarProdutoEvento()}"
+						execute="panelEventoProduto messageEventoProduto"
+						styleClass="toolbarButton toolbarButtonSave" />
+					
+					<a4j:commandButton value="#{bundle.LBL_associarTodos}"
+						action="#{eventoBB.associarTodosProdutos()}" render="dataTableProdutos"
+						styleClass="toolbarButton toolbarLinkAdd" />
+
+					<a4j:commandButton
+						value="#{bundle.LBL_desassociarTodos}"
+						action="#{eventoBB.desassociarTodosProdutos()}"
+						render="dataTableProdutos"
+						styleClass="toolbarButton toolbarLinkBreak" />
+					
+				</rich:toolbar>
+				<div style="height: 5px;" />
+				
+				<h:panelGrid columns="2" columnClasses="width17,width83" styleClass="panelGrid">
+						
+					<h:outputText styleClass="formLabel" value="#{bundle.LBL_evento_nome}" />
+					<h:inputText value="#{eventoBB.entity.nomeEvento}"  readonly="true" styleClass="width100" />
+				
+					<h:outputText styleClass="formLabel" value="#{bundle.LBL_produto_nome}" />
+					<h:panelGrid columns="1" styleClass="panelGrid">
+						<rich:autocomplete  var="produto"
+							minChars="4" 
+							autofill="false"
+							value="#{eventoBB.produto.nome}"
+							selectFirst="false"
+							autocompleteMethod="#{eventoBB.filtrarProdutoPorNome}" 
+							fetchValue="#{produto.nome}">
+							<h:column>
+								<h:outputText value="#{produto.id} - #{produto.nome}" />
+							</h:column>
+						</rich:autocomplete>
+					</h:panelGrid>
+				</h:panelGrid>
+				
+               <h:panelGrid columns="1" columnClasses="width10"
+					styleClass="width100">
+
+					<rich:dataTable columnClasses="width5,width70, width20"
+						id="dataTableProdutos" styleClass="width100" rows="8"
+						iterationStatusVar="it" value="#{eventoBB.produtosDTOList}"
+						noDataLabel="#{bundle.LBL_nenhumRegistroEncontrado}"
+						var="produtoDTO" rowKeyVar="rowKeyVar">
+
+						<rich:column styleClass="right">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_produto_id}" />
+							</f:facet>
+							<h:outputText value="#{produtoDTO.produto.id}" styleClass="right" />
+						</rich:column>
+
+						<rich:column styleClass="left" >
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_nome}" />
+							</f:facet>
+							<h:outputText value="#{produtoDTO.produto.nome}" />
+						</rich:column>
+						
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_associar}" />
+							</f:facet>
+							<h:selectBooleanCheckbox value="#{produtoDTO.selecionado}">
+								<a4j:ajax event="change" execute="dataTableProdutos" />
+							</h:selectBooleanCheckbox>
+						</rich:column>
+
+						<f:facet name="footer">
+							<rich:dataScroller for="dataTableProdutos"
+								page="#{eventoBB.currentEventoPage}"
+								rendered="#{eventoBB.dados.size() > 0}" />
+						</f:facet>
+					</rich:dataTable>
+				</h:panelGrid>
+				
+			</h:panelGrid>
+		</h:form>
+	</rich:popupPanel>	
+		
+		
+		
+		
+	</ui:define>
+</ui:composition>

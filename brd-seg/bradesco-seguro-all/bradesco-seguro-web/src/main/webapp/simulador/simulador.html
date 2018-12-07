@@ -1,0 +1,74 @@
+<html>
+<head>
+<style type="text/css">
+.titulo {
+	font-size: 40px;
+}
+
+.subtitulo {
+	font-size: 16px;
+	letter-spacing: 5px;
+}
+</style>
+</head>
+<body>
+	<table width="80%" align="center" style="margin-top: 50px;">
+		<tr>
+			<td align="center" width="100%">
+
+				<p class="titulo">Bradesco - Seguros</p>
+				<p class="subtitulo">Simulador de atendimento</p>
+				<form action="/bradesco-seguro-web/faces/venda.xhtml"
+					method="get">
+					<table width="500px" border="0" cellspacing="2" cellpadding="10">
+						<tr>
+							<td bgcolor="#e0e0e0">IdClienteCampanha:</td>
+							<td><input type="text" name="IdClienteCampanha"
+								id="IdClienteCampanha" tabindex="1" style="width: 100%" /></td>
+						</tr>
+						<tr>
+							<td bgcolor="#e0e0e0">UserID:</td>
+							<td><input name="UserID" type="text" id="UserID"
+								tabindex="2" value="treinamento01" style="width: 100%" /></td>
+						</tr>
+						<tr>
+							<td bgcolor="#e0e0e0">CallType:</td>
+							<td><input name="CallType" type="text" id="CallType"
+								tabindex="3" value="2" style="width: 100%" /></td>
+						</tr>
+						<tr>
+							<td bgcolor="#e0e0e0">phoneNumber:</td>
+							<td><input name="phoneNumber" type="text" id="phoneNumber"
+								tabindex="4" value="3432285009" style="width: 100%" /></td>
+						</tr>
+						<tr>
+							<td bgcolor="#e0e0e0">callURL:</td>
+							<td><input name="callURL" type="text" id="callURL"
+								tabindex="5" value="http://www.google.com" style="width: 100%" />
+							</td>
+						</tr>
+						<tr>
+							<td bgcolor="#e0e0e0">LyricallScript:</td>
+							<td><input name="LyricallScript" type="text"
+								id="LyricallScript" tabindex="6" value="Bradesco_Seguros"
+								style="width: 100%" /></td>
+						</tr>
+						<tr>
+							<td bgcolor="#e0e0e0">Chave de atendimento:</td>
+							<td><input name="chaveAtendimento" type="text"
+								id="chaveAtendimento" tabindex="6" value=""
+								style="width: 100%" /></td>
+						</tr>
+						<tr>
+							<td height="40" colspan="2" align="center" bgcolor="#cccccc"><input
+								type="submit" name="Submit" id="Submit" value="Submit"
+								tabindex="7" style="font-size: 16px;" /></td>
+						</tr>
+					</table>
+				</form>
+				<p>&nbsp;</p>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<sql-query name="Venda.updateDataEnvioNuvem">
+			<![CDATA[
+				    UPDATE TB_VENDA SET DATA_ENVIO = :dataEnvio
+				FROM
+						TB_BENEFICIARIO as beneficiario 
+	INNER JOIN			TB_BENEFICIARIO_PLANO as beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 				= beneficiarioPlano.ID_BENEFICIARIO
+	INNER JOIN			TB_PLANO as plano 									on beneficiarioPlano.ID_PLANO 					= plano.ID_PLANO
+	INNER JOIN			TB_PRODUTO as produto 								on plano.ID_PRODUTO 							= produto.ID_PRODUTO
+	INNER JOIN			TB_VENDA as venda 									on beneficiario.ID_VENDA 						= venda.ID_VENDA
+	INNER JOIN			TB_CLIENTE_CAMPANHA as cliente 						on venda.ID_CLIENTE_CAMPANHA 					= cliente.ID_CLIENTE_CAMPANHA 
+	INNER JOIN 			TB_CONTATO_MAILING as contatoMailing 				on cliente.ID_CONTATO_MAILING 					= contatoMailing.ID_CONTATO_MAILING
+	INNER JOIN 			TB_LOTE_MAILING as loteMailing 						on contatoMailing.ID_LOTE_MAILING 				= loteMailing.ID_LOTE_MAILING
+	INNER JOIN 			TB_CAMPANHA as campanha 							on loteMailing.ID_CAMPANHA 						= campanha.ID_CAMPANHA
+	INNER JOIN			TB_GRAU_PARENTESCO as grauParentesco				on beneficiario.ID_GRAU_PARENTESCO				= grauParentesco.ID_GRAU_PARENTESCO
+	INNER JOIN 			TB_EVENTO as evento									on venda.ID_EVENTO								= evento.ID_EVENTO
+	LEFT JOIN				TB_ESTADO_CIVIL as estadoCivil					on venda.ID_ESTADO_CIVIL						= estadoCivil.ID_ESTADO_CIVIL
+	LEFT JOIN				TB_PROFISSAO as profissao						on venda.ID_PROFISSAO							= profissao.ID_PROFISSAO
+	LEFT JOIN				TB_ESPORTE as esporte							on venda.ID_ESPORTE								= esporte.ID_ESPORTE
+				WHERE
+						evento.ID_TIPO_EVENTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+					AND 
+						venda.FLAG_VENDA_FECHADA = 1
+					AND 
+					    venda.DATA_ENVIO IS NULL
+					AND   
+						venda.DATA_VENDA <= :dataEnvio
+					AND 
+					(
+						( plano.ID_TIPO_PLANO = 2
+							AND 
+							  ( select planoTitular.ID_TIPO_PLANO 
+							    from tb_beneficiario AS beneficiarioTitular 
+							    INNER JOIN			TB_BENEFICIARIO_PLANO as titularPlano  		on beneficiarioTitular.ID_BENEFICIARIO 		= titularPlano.ID_BENEFICIARIO
+							    INNER JOIN			TB_PLANO as planoTitular 							on titularPlano.ID_PLANO 					= planoTitular.ID_PLANO
+							    INNER JOIN	TB_GRAU_PARENTESCO as parentescoTitular	on beneficiarioTitular.ID_GRAU_PARENTESCO = parentescoTitular.ID_GRAU_PARENTESCO
+							    WHERE beneficiarioTitular.ID_VENDA = venda.ID_VENDA 
+							    and parentescoTitular.CODIGO_EXTERNO = '01'
+							    ) = 2 
+						)
+						OR
+						grauParentesco.CODIGO_EXTERNO = '01' 
+					)
+	        ]]>
+	</sql-query>
+	
+</hibernate-mapping>	

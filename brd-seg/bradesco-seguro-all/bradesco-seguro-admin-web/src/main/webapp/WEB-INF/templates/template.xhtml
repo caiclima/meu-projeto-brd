@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:rich="http://richfaces.org/rich">
+
+    <f:view locale="#{localeBB.locale}">
+
+        <h:head>
+           <!--  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />-->
+            <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10" />
+            <h:outputStylesheet name="stylesheet.css" library="css" />
+			<h:outputScript library="js" target="head" name="Mascara.js"  />
+            <title><h:outputText value="#{bundle.Titulo_Aplicacao}" /></title>
+            <ui:insert name="head" />
+        </h:head>
+
+        <h:body>
+        
+        	<!-- header panel -->
+           	<ui:include src="/WEB-INF/templates/cabecalho.xhtml" />
+
+            <h:panelGroup styleClass="content" layout="block">
+                <div>
+                	<h:form>
+						<ui:insert name="body" />
+					</h:form>
+                </div>
+            </h:panelGroup>
+        </h:body>
+    </f:view>
+
+</html>

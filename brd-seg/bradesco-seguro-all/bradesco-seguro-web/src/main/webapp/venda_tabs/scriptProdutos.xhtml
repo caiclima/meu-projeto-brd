@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"  
+                xmlns:f="http://java.sun.com/jsf/core"              
+                xmlns:h="http://java.sun.com/jsf/html"  
+                xmlns:ui="http://java.sun.com/jsf/facelets"  
+                xmlns:a4j="http://richfaces.org/a4j"  
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jstl/core">
+    
+    <rich:messages id="errosProdutos" errorClass="error" fatalClass="fatal" infoClass="info" warnClass="warn" />
+    
+    <rich:panel id="panelScriptProdutos" styleClass=" alignTop">
+        <f:facet name="header">
+            <h:outputText value="Produtos" />
+        </f:facet>
+        <h:panelGrid columns="1" style="width:100%">
+            <h:inputTextarea id="textScriptProduto" readonly="true" value="#{vendaBB.scriptProduto}" style="width: 99%;height: 300px;"/>
+            <h:panelGrid columns="4">
+                <h:outputLabel value="Auditor:" />
+                <h:inputText id="userAuditor" value="#{vendaBB.usuarioAuditor}"/>
+                <h:outputLabel value="Senha auditor" />
+                <h:inputSecret id="passwAuditor" value="#{vendaBB.senhaAuditor}"/>
+            </h:panelGrid>
+            <h:commandButton value="Enviar" action="#{vendaBB.finalizaAtendimento()}"/>
+        </h:panelGrid>
+    </rich:panel>
+
+</ui:composition>

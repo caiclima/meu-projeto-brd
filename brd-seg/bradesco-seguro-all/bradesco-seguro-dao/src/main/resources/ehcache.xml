@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="ehcache.xsd" updateCheck="true"
+	monitoring="autodetect" dynamicConfig="true">
+
+	<defaultCache maxEntriesLocalHeap="10000" eternal="true" overflowToDisk="false" />
+
+<!-- 
+	<cache name="bradesco-seguro-web.war#bradesco-seguro-pu.br.com.callink.bradesco.seguro.entity.Evento" 
+		maxEntriesLocalHeap="10000" eternal="true" overflowToDisk="false" />
+		
+	<cache name="bradesco-seguro-web.war#bradesco-seguro-pu.br.com.callink.bradesco.seguro.entity.TipoEvento" 
+		maxEntriesLocalHeap="10000" eternal="true" overflowToDisk="false" />
+	
+	<cache name="bradesco-seguro-web.war#bradesco-seguro-pu.br.com.callink.bradesco.seguro.entity.ParametroSistema" 
+		maxEntriesLocalHeap="10000" eternal="true" overflowToDisk="false" />
+	
+	<cache name="bradesco-seguro-web.war#bradesco-seguro-pu.br.com.callink.bradesco.seguro.entity.GrauPrentesco" 
+		maxEntriesLocalHeap="10000" eternal="true" overflowToDisk="false" />
+		
+	<cache name="bradesco-seguro-web.war#bradesco-seguro-pu.br.com.callink.bradesco.seguro.entity.EstadoCivil" 
+		maxEntriesLocalHeap="10000" eternal="true" overflowToDisk="false" />		
+
+	<cache name="bradesco-seguro-web.war#bradesco-seguro-pu.br.com.callink.bradesco.seguro.entity.Esporte" 
+		maxEntriesLocalHeap="10000" eternal="true" overflowToDisk="false" />
+
+	<cache name="bradesco-seguro-web.war#bradesco-seguro-pu.br.com.callink.bradesco.seguro.entity.Profissao" 
+		maxEntriesLocalHeap="10000" eternal="true" overflowToDisk="false" />
+		
+	<cache name="bradesco-seguro-web.war#bradesco-seguro-pu.br.com.callink.bradesco.seguro.entity.ScriptAuditoria" 
+		maxEntriesLocalHeap="10000" eternal="true" overflowToDisk="false" />	
+
+	<cache name="bradesco-seguro-web.war#bradesco-seguro-pu.br.com.callink.bradesco.seguro.entity.Produto" 
+		maxEntriesLocalHeap="10000" eternal="true" overflowToDisk="false" />
+	 
+	<cache name="bradesco-seguro-web.war#bradesco-seguro-pu.br.com.callink.bradesco.seguro.entity.Plano" 
+		maxEntriesLocalHeap="10000" eternal="true" overflowToDisk="false" />  -->
+		
+		
+</ehcache>

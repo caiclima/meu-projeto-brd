@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/WEB-INF/templates/template.xhtml">
+
+	<ui:define name="head">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	</ui:define>
+
+	<ui:define name="body">
+
+		<rich:messages id="messages" errorClass="error" fatalClass="fatal" infoClass="info" warnClass="warn" />
+
+			<!-- crud operations -->
+			<rich:toolbar styleClass="width100 center">
+				<h:panelGrid columns="4">
+					<a4j:commandButton value="#{bundle.Salvar}" styleClass="toolbarButton toolbarButtonSave" rendered="#{auditorBB.modoNovo == 'true' and auditorBB.modoAtualizacao == 'false'}" action="#{auditorBB.salvar}" execute="@form" render="@form" />
+					<a4j:commandButton value="#{bundle.Cancelar}" styleClass="toolbarButton" rendered="#{auditorBB.modoAtualizacao == 'true' || auditorBB.modoNovo == 'true'}" action="#{auditorBB.cancelar}" execute="@form" render="@form" />
+					<a4j:commandButton value="#{bundle.Novo}" styleClass="toolbarButton toolbarButtonNew" rendered="#{auditorBB.modoNovo == 'false' and auditorBB.modoAtualizacao == 'false'}" action="#{auditorBB.novo}" execute="@form" render="@form" />
+					<a4j:commandButton value="#{bundle.Pesquisar}" styleClass="toolbarButton toolbarButtonFind" rendered="#{auditorBB.modoNovo == 'false' and auditorBB.modoAtualizacao == 'false'}" onclick="$(this).attr('disabled','disabled');" oncomplete="$(this).removeAttr('disabled');" disabled="#{auditorBB.modoAtualizacao == 'true'}" action="#{auditorBB.pesquisar}" title="#{bundle.Hint_Pesquisar}" execute="@form" render="@form" />
+				</h:panelGrid>
+			</rich:toolbar>
+		
+			<p></p>
+		
+			<!-- form -->	
+			<rich:panel styleClass="formPanel" id="panelComponentes" header="#{bundle.LBL_ListagemAuditores}">
+				<h:panelGrid columns="2" styleClass="panelGrid" >
+					<h:outputText styleClass="formLabel" value="#{bundle.LBL_login_usuario}:" />
+					<h:inputText styleClass="formField" value="#{auditorBB.pojo.loginUsuario}" maxlength="40" />
+					
+					<h:outputText styleClass="formLabel" value="#{bundle.LBL_Matricula}:" />
+					<h:inputText styleClass="formField" value="#{auditorBB.pojo.codigoMatricula}" maxlenght="10"/>
+					
+					<h:outputLabel styleClass="formLabel" value="#{bundle.LBL_cargo} :" />
+					<h:selectOneMenu value="#{auditorBB.pojo.cargo}" converter="CargoConverter">
+						<f:selectItem itemLabel="Selecione um cargo" itemValue="#{null}" />
+						<f:selectItems value="#{auditorBB.cargosList}" />
+					</h:selectOneMenu>	
+				</h:panelGrid>
+			</rich:panel>
+		
+			<rich:dataTable 
+				id="mainDataTable" styleClass="width100"
+				value="#{auditorBB.auditoresList}"
+				var="current" 
+				noDataLabel="#{bundle.Nenhum_Registro}"
+				rows="10"
+				rowClasses="rowOdd, rowEven"
+				rendered="#{! empty auditorBB.auditoresList}">
+				
+				<!-- custom columns -->
+				<rich:column styleClass="left" style="width:50%">
+					<f:facet name="header">
+						<h:outputText value="#{bundle.LBL_login_usuario}" />
+					</f:facet>
+					<h:outputText value="#{current.loginUsuario}" />
+				</rich:column>
+				
+				<rich:column styleClass="left" style="width:20%">
+					<f:facet name="header">
+						<h:outputText value="#{bundle.LBL_Matricula}" />
+					</f:facet>
+					<h:outputText value="#{current.codigoMatricula}" />
+				</rich:column>
+				
+				<rich:column styleClass="left" style="width:20%">
+					<f:facet name="header">
+						<h:outputText value="#{bundle.LBL_cargo}" />
+					</f:facet>
+					<h:outputText value="#{current.cargo.nomeCargo}" />
+				</rich:column>
+				
+				<!-- action columns -->
+				<rich:column styleClass="center gridActionColumn">
+					<f:facet name="header">
+						<h:outputText styleClass="gridActionLabel" value="#{bundle.Editar}" />
+					</f:facet>
+					<a4j:commandLink action="#{auditorBB.editar(current)}"
+						execute="@this" render="@form">
+						<h:graphicImage styleClass="button" library="imagens" name="edit.png" title="#{bundle.Hint_Editar}" />
+					</a4j:commandLink>
+				</rich:column>
+				
+				<rich:column styleClass="center gridActionColumn">
+					<f:facet name="header">
+						<h:outputText styleClass="gridActionLabel" value="#{bundle.Excluir}" />
+					</f:facet>
+					<a4j:commandLink action="#{auditorBB.excluir(current)}"
+						onclick="if ( confirm( 'Deseja realmente excluir o registro selecionado?' )==false ) {return false;}"
+						execute="@this" render="@form">
+						<h:graphicImage styleClass="button" library="imagens" name="delete.png" title="#{bundle.Hint_Excluir}" />
+					</a4j:commandLink>
+				</rich:column>
+				
+				<!-- footer -->
+				<f:facet name="footer">
+					<rich:dataScroller renderIfSinglePage="false" />
+				</f:facet>
+			</rich:dataTable>
+		
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+	<persistence-unit name="bradesco-seguro-pu"
+		transaction-type="JTA">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<jta-data-source>java:jboss/datasources/BradescoSeguroDS</jta-data-source>
+
+		<class>br.com.callink.bradesco.seguro.entity.Agente</class>
+		<class>br.com.callink.bradesco.seguro.entity.Beneficiario</class>
+	    <class>br.com.callink.bradesco.seguro.entity.BeneficiarioPlano</class>
+		<class>br.com.callink.bradesco.seguro.entity.Email</class>
+		<class>br.com.callink.bradesco.seguro.entity.TipoPlano</class>
+		<class>br.com.callink.bradesco.seguro.entity.TipoEvento</class>
+	    <class>br.com.callink.bradesco.seguro.entity.TelefoneCliente</class>
+	    <class>br.com.callink.bradesco.seguro.entity.ContatoMailing</class>
+	    <class>br.com.callink.bradesco.seguro.entity.HistoricoContato</class>
+	    <class>br.com.callink.bradesco.seguro.entity.Evento</class>
+	    <class>br.com.callink.bradesco.seguro.entity.DataBaseAlm</class>
+	    <class>br.com.callink.bradesco.seguro.entity.LoteMailing</class>
+	    <class>br.com.callink.bradesco.seguro.entity.Campanha</class>
+	    <class>br.com.callink.bradesco.seguro.entity.EventoCampanha</class>
+	    <class>br.com.callink.bradesco.seguro.entity.ClienteCampanha</class>
+	    <class>br.com.callink.bradesco.seguro.entity.ParametroSistema</class>
+	    <class>br.com.callink.bradesco.seguro.entity.ProdutoEvento</class>
+	    <class>br.com.callink.bradesco.seguro.entity.EstadoCivil</class>
+	    <class>br.com.callink.bradesco.seguro.entity.Venda</class>
+	    <class>br.com.callink.bradesco.seguro.entity.Profissao</class>
+	    <class>br.com.callink.bradesco.seguro.entity.Rejeicao</class>
+	    <class>br.com.callink.bradesco.seguro.entity.Produto</class>
+	    <class>br.com.callink.bradesco.seguro.entity.Esporte</class>
+	    <class>br.com.callink.bradesco.seguro.entity.GrauParentesco</class>
+	    <class>br.com.callink.bradesco.seguro.entity.Plano</class>
+	    <class>br.com.callink.bradesco.seguro.entity.Cargo</class>
+	    <class>br.com.callink.bradesco.seguro.entity.Dominio</class>
+	    <class>br.com.callink.bradesco.seguro.entity.Pessoa</class>
+	    <class>br.com.callink.bradesco.seguro.entity.PessoaColaborador</class>
+	    <class>br.com.callink.bradesco.seguro.entity.Usuario</class>
+	    <class>br.com.callink.bradesco.seguro.entity.UsuarioAdminParametroSistema</class>
+	    <class>br.com.callink.bradesco.seguro.entity.Cobertura</class>
+	    <class>br.com.callink.bradesco.seguro.entity.NuvemVendasRegistroHeader</class>
+	    <class>br.com.callink.bradesco.seguro.entity.NuvemVendasRegistroHeaderPplus</class>
+	    <class>br.com.callink.bradesco.seguro.entity.NuvemVendasRegistroHeaderDhi</class>
+
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+		<validation-mode>NONE</validation-mode>
+
+		<properties>
+			<property name="hibernate.archive.autodetection" value="class, hbm" />
+			<property name="hibernate.show_sql" value="${hibernate.show_sql}" />
+			<property name="hibernate.ejb.interceptor" value="br.com.callink.bradesco.seguro.dao.impl.utils.SQLServerInterceptor" />
+			<property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory" />
+			<property name="hibernate.cache.use_second_level_cache" value="true" />
+			<property name="hibernate.cache.use_query_cache" value="true" />
+			<property name="hibernate.dialect" value="br.com.callink.bradesco.seguro.dao.impl.utils.SQLServerCustomDialect"/> 
+		</properties>
+	</persistence-unit>
+</persistence>

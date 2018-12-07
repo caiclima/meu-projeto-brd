@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/WEB-INF/templates/template.xhtml"
+	xmlns:cts="http://br.com.callink/components/customs">
+
+	<ui:define name="head">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>#{bundle.LBL_cadCampanha}</title>
+	</ui:define>
+
+	<ui:define name="body">
+	<h:panelGrid styleClass="width100">
+
+		<h:form id="formListagemCampanhas">
+			<rich:panel id="panelListagemCampanhas"
+				header="#{bundle.LBL_listagemCampanhas}"
+				styleClass="height100">
+
+				<rich:messages id="messages" errorClass="error" fatalClass="fatal"
+					infoClass="info" warnClass="warn" />
+
+				<rich:toolbar height="30px">
+					<a4j:commandButton value="#{bundle.LBL_novo}"
+						action="#{campanhaBB.novoRegistro()}"
+						styleClass="toolbarButton toolbarButtonNew" execute="@this"
+						render="panelCampanha dataTableCampanhas"
+						oncomplete="#{rich:component('modalCampanha')}.show(); return false;" />
+
+					<a4j:commandButton value="#{bundle.LBL_pesquisar}"
+						action="#{campanhaBB.pesquisar}" execute="@form" render="dataTableCampanhas"
+						styleClass="toolbarButton toolbarButtonFind" />
+				</rich:toolbar>
+				<div style="height: 5px;" />
+				<h:panelGrid id="gridFiltros" cellspacing="2" cellpadding="2"
+					columns="2" columnClasses="width7,width93" styleClass="width30">
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_nome}:" />
+					<h:inputText value="#{campanhaBB.entity.nomeCampanha}" maxlength="50" converter="StringConverter" styleClass="width98" />
+					
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_ativo} :" />
+					<h:selectOneMenu value="#{campanhaBB.entity.flagEnabled}">
+							<f:selectItems value="#{campanhaBB.simNaoList}" />
+					</h:selectOneMenu>
+				</h:panelGrid>
+				<div style="height: 5px;" />
+
+				<h:panelGrid styleClass="width100">
+					<rich:dataTable
+						columnClasses="width5, width35, width10, width5, width5, width5, width10"
+						id="dataTableCampanhas" styleClass="width100"
+						iterationStatusVar="it" rows="13" value="#{campanhaBB.dados}"
+						var="campanha">
+
+						<rich:column styleClass="right">
+							<f:facet name="header">
+								<h:outputText value="Id Campanha" />
+							</f:facet>
+							<h:outputText value="#{campanha.id}" />
+						</rich:column>
+
+						<rich:column styleClass="left" sortBy="#{campanha.nomeCampanha}"
+							sortOrder="#{campanhaBB.getSortOrder('NOME')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_nome}"
+									render="dataTableCampanhas statusRequest"
+									action="#{campanhaBB.sortBy('NOME')}" />
+							</f:facet>
+							<h:outputText value="#{campanha.nomeCampanha}" />
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{campanha.sigla}"
+							sortOrder="#{campanhaBB.getSortOrder('SIGLA')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_sigla}"
+									render="dataTableCampanhas statusRequest"
+									action="#{campanhaBB.sortBy('SIGLA')}" />
+							</f:facet>
+							<h:outputText value="#{campanha.sigla}" />
+						</rich:column>
+						
+						<rich:column>
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_ativo}?" />
+							</f:facet>
+							<h:outputText value="#{campanha.flagEnabled}" converter="SimNaoConverter" />
+						</rich:column>
+
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_editar}" />
+							</f:facet>
+							<a4j:commandLink action="#{campanhaBB.editar(campanha)}"
+								execute="@this" render="panelCampanha"
+								oncomplete="#{rich:component('modalCampanha')}.show(); return false;">
+
+								<h:graphicImage library="imagens" name="edit.png"
+									alt="#{bundle.LBL_editar}"
+									title="#{bundle.LBL_editar}" styleClass="button" />
+							</a4j:commandLink>
+						</rich:column>
+
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_excluir}" />
+							</f:facet>
+							<a4j:commandLink action="#{campanhaBB.excluir(campanha)}"
+								execute="@this"
+								onclick="if ( confirm( 'Deseja realmente excluir o registro selecionado?' )==false ) {return false;}"
+								render="dataTableCampanhas statusRequest">
+
+								<h:graphicImage library="imagens" name="delete.png"
+									alt="#{bundle.LBL_excluir}"
+									title="#{bundle.LBL_excluir}" styleClass="button" />
+							</a4j:commandLink>
+						</rich:column>
+
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_associarEvtCampanha}" />
+							</f:facet>
+							<a4j:commandLink action="#{campanhaBB.prepararAssociar(campanha)}"
+								execute="@this" render="panelCampanhaEvento"
+								oncomplete="if(#{facesContext.maximumSeverity == null}) { #{rich:component('modalCampanhaEvento')}.show(); return false; }">
+
+								<h:graphicImage library="imagens" name="link_edit.png"
+									alt="#{bundle.LBL_associarEvtCampanha}"
+									title="#{bundle.LBL_associarEvtCampanha}"
+									styleClass="button" />
+							</a4j:commandLink>
+						</rich:column>
+
+						<f:facet name="footer">
+							<rich:dataScroller page="#{campanhaBB.currentCampanhaPage}"
+								rendered="#{campanhaBB.dados.size() > 0}" />
+						</f:facet>
+					</rich:dataTable>
+				</h:panelGrid>
+			</rich:panel>
+		</h:form>
+	</h:panelGrid>
+
+	<rich:popupPanel id="modalCampanha" width="655" height="450" modal="true">
+		
+			<f:facet name="header">
+	            <h:outputText value="Adicionar/Editar Campanha" />
+	        </f:facet>
+	        
+	        <f:facet name="controls">
+	            <h:outputLink value="#" onclick="#{rich:component('modalCampanha')}.hide(); return false;">
+	            	<h:graphicImage  library="imagens" name="close.png" 
+	            					 alt="#{bundle.LBL_fechar}" 
+	            					 title="#{bundle.LBL_fechar}"
+									 styleClass="button" />
+	            </h:outputLink>
+	        </f:facet>
+			<h:form id="formCampanhas">
+
+			<rich:messages id="messagesCampanha" errorClass="error"
+				fatalClass="fatal" infoClass="info" warnClass="warn" />
+
+			<h:panelGrid id="panelCampanha" styleClass="width100">
+				<rich:toolbar height="30px" styleClass="width100">
+					<a4j:commandButton value="#{bundle.LBL_salvar}"
+						action="#{campanhaBB.salvar()}"
+						execute="panelCampanha messagesCampanha"
+						render="dataTableCampanhas panelCampanha messagesCampanha messages"
+						styleClass="toolbarButton toolbarButtonSave" oncomplete="if (#{campanhaBB.sucesso}) #{rich:component('modalCampanha')}.hide();" />
+
+				</rich:toolbar>
+				<div style="height: 5px;" />
+
+				<rich:panel header="#{bundle.LBL_dadosCampanha}"
+					styleClass="width100" bodyClass="padding2">
+
+					<h:panelGrid columns="2" columnClasses="width20,width80" styleClass="width100">
+						<h:outputLabel styleClass="label-output required" value="#{bundle.LBL_nome} :" />
+						<h:panelGroup>
+							<h:inputHidden value="#{campanhaBB.entity.id}" converter="BigIntegerConverter"/>
+							<h:inputText value="#{campanhaBB.entity.nomeCampanha}" maxlength="50" styleClass="width100"
+										 required="true" requiredMessage="#{bundle.MSG_campo_obrigatorio_nome_campanha}" />
+						</h:panelGroup>
+						
+						<h:outputLabel styleClass="label-output required" value="#{bundle.LBL_codigoExterno} :" />
+						<h:panelGroup>
+							<h:inputText value="#{campanhaBB.entity.codigoExterno}" maxlength="20" styleClass="width100" />
+						</h:panelGroup>
+						
+						<h:outputLabel styleClass="label-output required" value="#{bundle.LBL_sigla} :" />
+						<h:panelGroup>
+							<h:inputText value="#{campanhaBB.entity.sigla}" maxlength="20" styleClass="width100" />
+						</h:panelGroup>
+						
+						<h:outputLabel styleClass="label-output" value="#{bundle.LBL_DataBaseAlm} :" />
+						<h:selectOneMenu value="#{campanhaBB.entity.dataBaseAlm}" converter="DataBaseAlmConverter">
+							<f:selectItems value="#{campanhaBB.dataBaseAlmSelectItem}" />
+						</h:selectOneMenu>
+						
+						<h:outputLabel styleClass="label-output" value="#{bundle.LBL_ativo}?" />
+						<h:selectOneMenu value="#{campanhaBB.entity.flagEnabled}" >
+							<f:selectItem itemLabel="Sim" itemValue="#{true}" />
+							<f:selectItem itemLabel="Não" itemValue="#{false}" />
+						</h:selectOneMenu>
+					</h:panelGrid>
+
+					<h:panelGrid columns="1" styleClass="width100">
+						<rich:panel header="#{bundle.LBL_cfgAgendamento}" styleClass="width100" bodyClass="padding2">
+							<h:panelGrid columns="2" columnClasses="width33,width67" styleClass="width100">
+								<h:outputLabel styleClass="label-output" value="#{bundle.LBL_qtdMaxAgendamento} :" />
+								<h:inputText value="#{campanhaBB.entity.qtdAgendamentoAtendente}"
+									maxlength="9" onkeypress="mascara(this,soNumeros);" onkeydown="mascara(this,soNumeros);" onkeyup="mascara(this,soNumeros);" />
+								
+								<h:outputLabel styleClass="label-output" value="#{bundle.LBL_qtdMaxCliente} :" />
+								<h:inputText value="#{campanhaBB.entity.qtdAgendamentoCliente}"
+									maxlength="9" onkeypress="mascara(this,soNumeros);" onkeydown="mascara(this,soNumeros);" onkeyup="mascara(this,soNumeros);" />
+									
+								<h:outputLabel styleClass="label-output" value="#{bundle.LBL_qtdMaxDias} :" />
+								<h:inputText value="#{campanhaBB.entity.numMaximoDiasAgendamento}"
+									maxlength="9" onkeypress="mascara(this,soNumeros);" onkeydown="mascara(this,soNumeros);" onkeyup="mascara(this,soNumeros);" />
+							</h:panelGrid>
+						</rich:panel>
+					</h:panelGrid>
+				</rich:panel>
+			</h:panelGrid>
+		</h:form>
+	</rich:popupPanel>
+
+
+	<rich:popupPanel id="modalCampanhaEvento" width="655" height="500" modal="true">
+	
+		<f:facet name="header">
+            <h:outputText value="Evento(s) Associado(s) a Campanha" />
+        </f:facet>
+        
+        <f:facet name="controls">
+            <h:outputLink value="#" onclick="#{rich:component('modalCampanhaEvento')}.hide();">
+            	<h:graphicImage  library="imagens" name="close.png" 
+            					 alt="#{bundle.LBL_fechar}" 
+            					 title="#{bundle.LBL_fechar}"
+								 styleClass="button" />
+				<a4j:ajax event="click" listener="#{campanhaBB.limparDadosAssociacao()}"></a4j:ajax>
+            </h:outputLink>
+        </f:facet>
+		<h:form id="formAssociacaoCampanhaEvento">
+
+			<rich:messages id="messagesCampanhaEvento" errorClass="error"
+				fatalClass="fatal" infoClass="info" warnClass="warn" />
+
+			<h:panelGrid id="panelCampanhaEvento" styleClass="width100">
+				<rich:toolbar height="30px" styleClass="width100">
+					<a4j:commandButton value="#{bundle.LBL_pesquisar}"
+						render="dataTableEventos"
+						action="#{campanhaBB.carregarAssociacoes()}"
+						styleClass="toolbarButton toolbarButtonFind" />
+						
+					<a4j:commandButton value="#{bundle.LBL_salvar}"
+						action="#{campanhaBB.associarOuDesassociarEventos()}"
+						execute="panelCampanhaEvento messagesCampanhaEvento"
+						styleClass="toolbarButton toolbarButtonSave" />
+
+					<a4j:commandButton value="#{bundle.LBL_associarTodos}"
+						action="#{campanhaBB.associarTodos()}" render="dataTableEventos"
+						styleClass="toolbarButton toolbarLinkAdd" />
+
+					<a4j:commandButton
+						value="#{bundle.LBL_desassociarTodos}"
+						action="#{campanhaBB.desassociarTodos()}"
+						render="dataTableEventos"
+						styleClass="toolbarButton toolbarLinkBreak" />
+				</rich:toolbar>
+				<div style="height: 5px;" />
+				
+				<h:panelGrid columns="2" columnClasses="width17,width83" styleClass="panelGrid">
+				
+				<h:outputText styleClass="formLabel" value="#{bundle.LBL_campanha}" />
+				<h:inputText value="#{campanhaBB.entity.nomeCampanha}"  readonly="true" styleClass="width100" />
+				
+					<h:outputText styleClass="formLabel" value="Evento" />
+					<h:panelGrid columns="1" styleClass="panelGrid">
+						<rich:autocomplete  var="obj"
+							minChars="4" 
+							autofill="false"
+							value="#{campanhaBB.eventoSelecionado}"
+							selectFirst="false"
+							autocompleteMethod="#{campanhaBB.filterEventosByNome}" 
+							fetchValue="#{obj.id} - #{obj.nomeEvento}">
+							<h:column>
+								<h:outputText value="#{obj.id} - #{obj.nomeEvento}" />
+							</h:column>
+						</rich:autocomplete>
+					</h:panelGrid>
+
+					<h:outputText styleClass="formLabel" value="Tipo Evento" />
+					<h:panelGrid columns="1" styleClass="panelGrid">
+						<rich:autocomplete var="obj"
+							minChars="4" 
+							autofill="false" 
+							value="#{campanhaBB.tipoEventoSelecionado}" 
+							selectFirst="false"
+							autocompleteMethod="#{campanhaBB.filterTipoEventosByNome}" 
+							fetchValue="#{obj.id} - #{obj.nomeTipoEvento}">
+							<h:column>
+								<h:outputText value="#{obj.id} - #{obj.nomeTipoEvento}" />
+							</h:column>
+						</rich:autocomplete>
+					</h:panelGrid>
+				</h:panelGrid>
+
+				<h:panelGrid columns="1" columnClasses="width10"
+					styleClass="width100">
+
+					<rich:dataTable columnClasses="width5,width70, width20"
+						id="dataTableEventos" styleClass="width100" rows="8"
+						iterationStatusVar="it" value="#{campanhaBB.eventosDTO}"
+						noDataLabel="#{bundle.LBL_nenhumRegistroEncontrado}"
+						var="eventoDTO" rowKeyVar="rowKeyVar">
+
+						<rich:column styleClass="right">
+							<f:facet name="header">
+								<h:outputText value="Id Evento" />
+							</f:facet>
+							<h:outputText value="#{eventoDTO.evento.id}" styleClass="right" />
+						</rich:column>
+
+						<rich:column styleClass="left" sortBy="#{eventoDTO.evento.nomeEvento}"
+							sortOrder="#{campanhaBB.getSortOrder('NOME_EVENTO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_nome}"
+									render="dataTableEventos"
+									action="#{campanhaBB.sortBy('NOME_EVENTO')}" />
+							</f:facet>
+							<h:outputText value="#{eventoDTO.evento.nomeEvento}" />
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{eventoDTO.tipoEvento.nomeTipoEvento}">
+							<f:facet name="header">
+								<h:outputText value="Tipo Evento" />
+							</f:facet>
+							<h:outputText value="#{eventoDTO.evento.tipoEvento.nomeTipoEvento}" />
+						</rich:column>
+
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_associar}" />
+							</f:facet>
+							<h:selectBooleanCheckbox value="#{eventoDTO.associado}">
+								<a4j:ajax event="change" execute="dataTableEventos" />
+							</h:selectBooleanCheckbox>
+						</rich:column>
+
+						<f:facet name="footer">
+							<rich:dataScroller for="dataTableEventos"
+								page="#{campanhaBB.currentEventoPage}"
+								rendered="#{campanhaBB.dados.size() > 0}" />
+						</f:facet>
+					</rich:dataTable>
+				</h:panelGrid>
+			</h:panelGrid>
+		</h:form>
+	</rich:popupPanel>
+
+	</ui:define>
+</ui:composition>

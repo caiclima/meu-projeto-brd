@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	
+	<query name="HistoricoContato.buscarHistoricoPorPeriodoDataContato">
+		<![CDATA[
+			SELECT	h.id as idHistoricoContato,
+					0 as cnPessoa,
+					cm.cpf as cpf,
+					h.dataContato as dataContato,
+					(SELECT TOP('1','VALOR_PARAMETRO_SISTEMA') FROM ParametroSistema WHERE nomeParametroSistema='ID_TIPO_CONTATO_ENVIO_EVENTO_WSPROPOSTA_TRIBANCO') as idTipoContato,
+					1 as idTipoAssunto,
+					e.codigoExterno as eventoCodigoExterno,
+					camp.codigoExterno as campanhaCodigoExterno,
+					h.detalhamentoEvento as detalhamentoEvento
+			FROM	
+					HistoricoContato AS h
+					INNER JOIN h.evento AS e
+					INNER JOIN h.clienteCampanha AS c
+					INNER JOIN c.contatoMailing AS cm
+					INNER JOIN c.campanha AS camp
+			WHERE	e.codigoExterno IS NOT NULL
+					AND		h.dataContato BETWEEN :dataInicial and :dataFinal
+					AND 	h.flagContatoEnviado is null
+        ]]>
+	</query>
+	<!-- e.tipoFinalizacao as tipoFinalizacao -->
+	
+	<query name="HistoricoContato.atualizarFlagContatoEnviado">
+		<![CDATA[
+			UPDATE HistoricoContato SET flagContatoEnviado = :flagContatoEnviado WHERE id IN (:ids)
+		]]>
+	</query>
+	
+	
+	<query name="HistoricoContato.historicoContatoByIdClienteCampanha">
+		<![CDATA[
+			select 
+				historico 
+			from 
+				HistoricoContato as historico 
+				inner join historico.evento as eventos 
+			where 
+				historico.idClienteCampanha = :idCLiente
+				and eventos.flagGateway = :flagGateway
+			order by
+				historico.dataContato desc
+		]]>
+	</query>
+	
+	<query name="HistoricoContato.atualizarFlagContatoNaoEnviado">
+		<![CDATA[
+		
+			UPDATE HistoricoContato SET flagContatoEnviado = :flagContatoEnviado
+			
+		]]>
+	</query>
+	
+	<query name="HistoricoContato.historicoContatoByCnpj">
+		<![CDATA[
+			select 
+				historico 
+			from 
+				HistoricoContato as historico 
+				inner join historico.clienteCampanha as clienteCampanha 
+				inner join clienteCampanha.contatoMailing as contatoMailing 
+				inner join historico.evento as eventos 
+			where 
+				contatoMailing.cpf = :cpf
+				and eventos.flagGateway = :flagGateway
+			order by
+				historico.dataContato desc
+		]]>
+	</query>
+	
+	<query name="HistoricoContato.buscarPorChaveAtendimento">
+		SELECT historicoContato
+		  FROM HistoricoContato AS historicoContato
+		 WHERE historicoContato.chaveAtendimento = :chaveAtendimento 
+	</query>
+	
+</hibernate-mapping>

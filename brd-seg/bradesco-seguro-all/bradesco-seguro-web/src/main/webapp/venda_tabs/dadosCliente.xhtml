@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"  
+                xmlns:f="http://java.sun.com/jsf/core"              
+                xmlns:h="http://java.sun.com/jsf/html"  
+                xmlns:ui="http://java.sun.com/jsf/facelets"  
+                xmlns:a4j="http://richfaces.org/a4j"  
+                xmlns:rich="http://richfaces.org/rich"
+                xmlns:c="http://java.sun.com/jstl/core">
+	
+	<rich:panel id="panelCliente" styleClass=" alignTop">
+
+		<rich:toolbar itemSeparator="grid" >
+	 		<rich:toolbarGroup location="lefth" styleClass="height100">
+	 			<h:outputLabel value="#{bundle.label_dados_cliente}" />
+	 		</rich:toolbarGroup>
+	 	</rich:toolbar>
+
+		<h:panelGrid columns="2" styleClass="width100" columnClasses="width55,width45">
+			<h:panelGrid columns="1">
+				<h:panelGrid columns="2" columnClasses="width75,width25" style="visibility:#{vendaBB.showDadosEmpresa}" id="panelDadosEmpresa">
+					<h:panelGrid columns="2" columnClasses="width5,width95">
+						<h:outputLabel value="#{bundle.label_empresa}:" />
+						<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.empresa}" maxlength="200" styleClass="width100"/>
+					</h:panelGrid>	
+	
+					<h:panelGrid columns="2" columnClasses="width5,width95">
+						<h:panelGrid columns="2">
+							<h:outputLabel value="#{bundle.label_cnpj}:" />
+							<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.cnpj}" styleClass="width100" maxlength="18"/>
+						</h:panelGrid>	
+					</h:panelGrid>	
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2" columnClasses="width75,width25">
+					<h:panelGrid columns="2" columnClasses="width5,width95">
+						<h:outputLabel value="#{bundle.label_nome}:" />
+						<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.nome}" maxlength="100" styleClass="width100"/>
+					</h:panelGrid>	
+	
+					<h:panelGrid columns="2" columnClasses="width45,width55">
+						<h:panelGrid columns="2">
+							<h:outputLabel value="#{bundle.label_cpf}:" />
+							<h:inputText value="#{vendaBB.cpfInicio}" readonly="true" styleClass="width100" maxlength="3"/>
+						</h:panelGrid>	
+						
+						<h:panelGrid columns="3" columnClasses="width65,width1,width34">
+							<h:inputText value="#{vendaBB.cpfMeio}" maxlength="6" onkeypress="mascara(this,soNumeros);" styleClass="width100"
+							onkeydown="mascara(this,soNumeros);" onkeyup="mascara(this,soNumeros);" />
+							<h:outputLabel value="-" style="margin-left: 1px;"/>
+							<h:inputText value="#{vendaBB.cpfFim}" readonly="true" styleClass="width100" maxlength="2"/>
+						</h:panelGrid>	
+					</h:panelGrid>	
+				</h:panelGrid>
+	
+				<h:panelGrid columns="3" columnClasses="width45,width20,width35">
+					<h:panelGrid columns="2" columnClasses="width10,width90">
+						<h:outputLabel value="#{bundle.label_profissao}:" />
+						<h:selectOneMenu id="profissaoSelec" value="#{vendaBB.entity.profissao}" converter="GenericConverter" styleClass="width100">
+							<f:selectItems value="#{vendaBB.profissaoSelectItem}" />
+							<a4j:ajax event="valueChange" render="invalidezCheck" listener="#{vendaBB.atualizarInvalidezCombo}" execute="@this"/>
+						</h:selectOneMenu>
+					</h:panelGrid>
+					<h:panelGrid columns="2" columnClasses="width61,width30">
+						<h:outputLabel value="#{bundle.label_aposentado_invalidez}" />
+						<h:selectBooleanCheckbox value="#{vendaBB.entity.flagAposentadoInvalidez}" id="invalidezCheck">
+							<a4j:ajax event="valueChange" render="profissaoSelec" listener="#{vendaBB.atualizarInvalidez}" execute="@this"/>
+						</h:selectBooleanCheckbox>
+					</h:panelGrid>
+					<h:panelGrid columns="2" columnClasses="width10,width90" style="visibility:#{vendaBB.showEsporte}" id="panelEsporte">
+						<h:outputLabel value="#{bundle.label_esporte}:" />
+						<h:selectOneMenu value="#{vendaBB.entity.esporte}" converter="GenericConverter" styleClass="width100">
+							<f:selectItems value="#{vendaBB.esporteSelectItem}" />
+						</h:selectOneMenu>
+					</h:panelGrid>
+				</h:panelGrid>
+				
+				<h:panelGrid columns="6" columnClasses="width40,width20,width40">
+					<h:panelGrid columns="2" columnClasses="width15,width85">
+						<h:outputLabel value="#{bundle.label_data_nascimento}:" />
+						<rich:calendar datePattern="dd/MM/yyyy" inputSize="13" showApplyButton="false" 
+									   value="#{vendaBB.entity.clienteCampanha.contatoMailing.dataNascimento}" converter="DateConverter"
+									    readonly="true">
+							<a4j:ajax event="change" render="idade, selectPlano" listener="#{vendaBB.calcularIdade}" execute="@this" />
+						</rich:calendar>
+					</h:panelGrid>	
+					<h:panelGrid columns="2" columnClasses="width25,width85">
+						<h:outputLabel value="#{bundle.label_idade}:" />
+						<h:inputText readonly="true" value="#{vendaBB.idade}" id="idade" styleClass="width70" maxlength="3"/>
+					</h:panelGrid>	
+					<h:panelGrid columns="2" columnClasses="width20,width80">
+						<h:outputLabel value="#{bundle.label_estado_civil}:" />
+						<h:selectOneMenu value="#{vendaBB.entity.estadoCivil}" styleClass="width100" converter="GenericConverter" >
+							<f:selectItems value="#{vendaBB.estadoCivilSelectItem}" />
+						</h:selectOneMenu>
+					</h:panelGrid>	
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2" columnClasses="width65,width35">
+					<h:panelGrid columns="4" columnClasses="width10,width70,width10,width10">
+						<h:outputLabel value="#{bundle.label_endereco}:" />
+						<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.endereco}" styleClass="width99" maxlength="40"/>
+						<h:outputLabel value="#{bundle.label_numero}:" />
+						<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.numeroEndereco}" styleClass="width100" maxlength="5"
+							onkeypress="mascara(this,soNumeros);" onkeydown="mascara(this,soNumeros);" onkeyup="mascara(this,soNumeros);"/>
+					</h:panelGrid>
+					
+					<h:panelGrid columns="2" columnClasses="width10,width85">
+						<h:outputLabel value="#{bundle.label_complemento}:" />
+						<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.complementoEndereco}" maxlength="15" styleClass="width100" />
+					</h:panelGrid>
+				</h:panelGrid>		
+				
+				<h:panelGrid columns="4" columnClasses="width70,width50,width10">
+					<h:panelGrid columns="2" columnClasses="width10,width90">
+						<h:outputLabel value="#{bundle.label_bairro}:" />
+						<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.bairro}" maxlength="60" styleClass="width80" />
+					</h:panelGrid>	
+					
+					<h:panelGrid columns="2" columnClasses="width15,width85">
+						<h:outputLabel value="#{bundle.label_CEP}:" />
+						<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.cep}" maxlength="8" styleClass="width100"
+							onkeypress="mascara(this,soNumeros);" onkeydown="mascara(this,soNumeros);" onkeyup="mascara(this,soNumeros);"/>
+					</h:panelGrid>	
+				</h:panelGrid>
+				
+				<h:panelGrid columns="4" columnClasses="width70,width50,width10">
+					<h:panelGrid columns="2" columnClasses="width10,width85">
+						<h:outputLabel value="#{bundle.label_Cidade}:" />
+						<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.cidade}" maxlength="60" styleClass="width80" />
+					</h:panelGrid>		
+					
+					<h:panelGrid columns="2" columnClasses="width15,width85">
+						<h:outputLabel value="#{bundle.label_UF}:" />
+						
+						<h:selectOneMenu value="#{vendaBB.entity.clienteCampanha.contatoMailing.uf}" styleClass="width100">
+							<f:selectItem itemLabel="Selecione..." />
+							<f:selectItems value="#{vendaBB.estadoList}" var="estado" itemLabel="#{estado.nome} - #{estado.uf}" itemValue="#{estado.uf}" />
+						</h:selectOneMenu>
+					</h:panelGrid>	
+				</h:panelGrid>
+				
+				<h:panelGrid columns="6" columnClasses="width33,width33,width33">
+					<h:panelGrid columns="2" columnClasses="width10,width85">
+						<h:outputLabel value="#{bundle.label_rg}:" />
+						<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.rg}" maxlength="15" styleClass="width100"/>
+					</h:panelGrid>	
+						
+					<h:panelGrid columns="2" columnClasses="width50,width50">	
+						<h:outputLabel value="#{bundle.label_orgao_expedidor}:" />
+						<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.orgaoExpedidor}" maxlength="5" styleClass="width100"/>
+					</h:panelGrid>	
+	
+					<h:panelGrid columns="2" columnClasses="width40,width60">
+						<h:outputLabel value="#{bundle.label_data_expedicao}:" />
+						<rich:calendar datePattern="dd/MM/yyyy" inputSize="13" showApplyButton="false"
+								       value="#{vendaBB.entity.clienteCampanha.contatoMailing.dataExpedicao}" converter="DateConverter" styleClass="width100"/>
+					</h:panelGrid>			       
+				</h:panelGrid>	
+	
+			    <h:panelGrid columns="4" columnClasses="width45,width20,width35">
+			    	<h:panelGrid columns="2" columnClasses="width10,width90">
+						<h:outputLabel value="#{bundle.label_email}:" />
+						<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.email}" maxlength="100" styleClass="width100"/>
+					</h:panelGrid>	
+					
+					<h:panelGrid columns="2" columnClasses="width15,width85">
+						<h:outputLabel value="#{bundle.label_sexo}:" />
+						<h:selectOneMenu value="#{vendaBB.entity.clienteCampanha.contatoMailing.sexo}" styleClass="width100">
+							<f:selectItem itemLabel="Selecione..." />
+								<f:selectItems value="#{vendaBB.sexoList}" var="sexo" itemLabel="#{sexo}" itemValue="#{sexo.valor}" />
+						</h:selectOneMenu>
+					</h:panelGrid>
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2" columnClasses="width50,width50">
+					<h:panelGrid columns="2" columnClasses="width85,width15">
+						<h:outputLabel value="#{bundle.label_recebe_ofertas_email}" />
+						<h:selectBooleanCheckbox value="#{vendaBB.entity.clienteCampanha.contatoMailing.flagRecebeOfertasEmail}" />
+					</h:panelGrid>
+					<h:panelGrid columns="2" columnClasses="width95,width5">
+						<h:outputLabel value="#{bundle.label_recebe_certificado_email}" />
+						<h:selectBooleanCheckbox value="#{vendaBB.entity.clienteCampanha.contatoMailing.flagRecebeCertificadoEmail}" />
+					</h:panelGrid>
+				</h:panelGrid>
+				
+				<h:panelGrid columns="6" columnClasses="width42,width42,width16">
+					<h:panelGrid columns="2" columnClasses="width15,width85">
+						<h:outputLabel value="#{bundle.label_produto}:" />
+						<h:selectOneMenu value="#{vendaBB.produtoSelecionado}" converter="GenericConverter" styleClass="width100" id="selectProduto">
+							<f:selectItems value="#{vendaBB.produtoSelectItem}" />
+							<a4j:ajax event="valueChange" listener="#{vendaBB.atualizarHiv}" execute="@this"
+									  render="selectPlano, panelHiv, panelDadosEmpresa, panelEsporte, valorSelecionado, btnConfirma, formVenda:btnFinaliza, 
+									  formVenda:btnFinalizaVenda, panelDependente, labelEsporte, selectionEsporte, columnEsporte, labelNovoEsporte, selectionNovoEsporte" />
+						</h:selectOneMenu>
+					</h:panelGrid>	
+			
+					<h:panelGrid columns="2" columnClasses="width10,width90">
+						<h:outputLabel value="#{bundle.label_plano}:" />
+						<h:selectOneMenu value="#{vendaBB.planoSelecionado}" id="selectPlano" converter="PlanoConverter" styleClass="width100">
+							<f:selectItems value="#{vendaBB.planoSelectItem}" />
+							<a4j:ajax event="valueChange" render="valorSelecionado, btnConfirma, formVenda:btnFinaliza, formVenda:btnFinalizaVenda panelDependente" 
+									  listener="#{vendaBB.calcularPlanoSelecionadoAndSetarTipoPlano}" execute="@this"/>
+							
+								
+							  
+						</h:selectOneMenu>
+					</h:panelGrid>	
+				
+					<h:panelGrid columns="2" columnClasses="width15,width85" id="valorSelecionado">
+						<h:outputLabel value="#{bundle.label_valor}:" />
+						<h:inputText value="#{vendaBB.entity.valorTotal}" readonly="true" converter="defaultDecimal" styleClass="width100" />
+					</h:panelGrid>	
+				</h:panelGrid>
+	
+				<h:panelGrid columns="6" columnClasses="width10,width55,width35">
+					<h:panelGrid columns="2" columnClasses="width10,width85">
+						<h:outputLabel value="#{bundle.label_cartao}:" />
+						<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.cartao}" readonly="true" maxlength="20"/>
+					</h:panelGrid>	
+					<h:panelGrid columns="2" columnClasses="width30,width20">	
+						<h:outputLabel value="#{bundle.label_vencimento_cartao}:" />
+						<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.validadeCartao}" readonly="true" maxlength="8" styleClass="width100"/>
+					</h:panelGrid>	
+					<h:panelGrid columns="2" columnClasses="width80,width20">
+						<h:outputLabel value="#{bundle.label_dia_vencimento_fatura}:" />
+						<h:inputText value="#{vendaBB.entity.clienteCampanha.contatoMailing.diaVencecimentoFatura}" readonly="true" styleClass="width100" maxlength="2"/>
+					</h:panelGrid>										
+				</h:panelGrid>
+	
+				<h:panelGrid columns="2" style="visibility:#{vendaBB.showHiv}" id="panelHiv">
+					<h:outputLabel value="#{bundle.label_portador_hiv}:"  />
+					<h:selectOneRadio value="#{vendaBB.entity.flagHiv}" >
+						<f:selectItem itemValue="true" itemLabel="#{bundle.label_sim}:" />
+						<f:selectItem itemValue="false" itemLabel="#{bundle.label_nao}:" />
+					</h:selectOneRadio>
+				</h:panelGrid>
+				
+				<a4j:commandButton value="#{bundle.button_confirma}" action="#{vendaBB.salvar(false)}" execute="@form" 
+								   render="messagesDadosCliente, formVenda:btnFinaliza, formVenda:btnFinalizaVenda btnConfirma, panelDependente, formVenda:tiposEventoDataTable, formVenda:eventosDataTable" 
+								   id="btnConfirma"
+					               style="visibility:#{vendaBB.showConfirma}"/> 
+				
+			</h:panelGrid>
+			<h:panelGrid columns="1" styleClass="width100">
+				<h:panelGrid columns="1" styleClass="width100">
+					<rich:panel id="panelTelefonesCliente" styleClass="width99">
+						<f:facet name="header">
+				            <h:outputLabel value="#{bundle.label_Telefones_cliente}" />
+				        </f:facet>
+						<rich:dataTable id="dataTableTelefones" styleClass="width100" columnClasses="width10,width40,width50"
+							            iterationStatusVar="it" value="#{vendaBB.telefones}" var="telefone">
+			
+							<rich:column styleClass="center">
+								<f:facet name="header">
+									<h:outputText value="#{bundle.label_ddd}" />
+								</f:facet>
+								<h:outputText value="#{telefone.ddd}" converter="TelefoneConverterTable"/>
+							</rich:column>
+			
+							<rich:column styleClass="center">
+								<f:facet name="header">
+									<h:outputText value="#{bundle.label_telefone}" />
+								</f:facet>
+								<h:outputText value="#{telefone.telefone}" converter="TelefoneConverterTable"/>
+							</rich:column>
+							
+							<rich:column styleClass="center">
+								<f:facet name="header">
+									<h:outputText value="#{bundle.label_receber_ofertas_sms}" />
+								</f:facet>
+									<h:selectBooleanCheckbox value="#{telefone.flagRecebeSms}">
+										<a4j:ajax execute="@this" listener="#{vendaBB.updateTelefone(telefone)}" render="dataTableTelefones"/>
+									</h:selectBooleanCheckbox>
+							</rich:column>
+							
+	<!-- 											<rich:column styleClass="center"> -->
+	<!-- 												<f:facet name="header"> -->
+	<!-- 													<h:outputText value="#{bundle.label_receber_ofertas_sms}" /> -->
+	<!-- 												</f:facet> -->
+	<!-- 													<a4j:commandLink action="#{vendaBB.inativarTelefone(telefone)}" -->
+	<!-- 													execute="@this" render="@form"> -->
+	<!-- 													<c:if test="#{telefone.flagEnabled}"> -->
+	<!-- 														<h:graphicImage styleClass="button" library="imagens" name="delete.png" title="#{bundle.hint_ativar}" /> -->
+	<!-- 													</c:if>	 -->
+	<!-- 													<c:if test="not #{telefone.flagEnabled}"> -->
+	<!-- 														<h:graphicImage styleClass="button" library="imagens" name="aplicar.png" title="#{bundle.hint_inativar}" /> -->
+	<!-- 													</c:if> -->
+	<!-- 												</a4j:commandLink> -->
+	<!-- 											</rich:column> -->
+							
+						</rich:dataTable>
+					</rich:panel>
+				</h:panelGrid>	
+				<h:panelGrid columns="1" styleClass="width100">
+					<ui:include src="../venda_tabs/panelEventos.xhtml" />	
+				</h:panelGrid>	
+			</h:panelGrid>	
+		</h:panelGrid>	
+		
+		<rich:panel id="panelDependente" styleClass=" alignTop" style="visibility:#{vendaBB.showAbaDependente}">
+
+		<rich:toolbar itemSeparator="grid" >
+	 		<rich:toolbarGroup location="lefth">
+	 			<h:outputLabel value="#{bundle.label_dependentes}" />
+	 		</rich:toolbarGroup>
+	 	</rich:toolbar>
+	 	
+	 	<h:panelGrid styleClass="width100">
+			<a4j:jsFunction name="initPage" action="#" execute="@none" />
+
+			<rich:panel id="panelListagemDependentes" header="#{bundle.label_listagem_dependentes}" styleClass="height100">
+
+			
+
+				<rich:toolbar height="30px">
+				
+					<a4j:commandButton value="#{bundle.Novo}"
+						action="#{vendaBB.beneficiarioBB.novoRegistro}"
+						styleClass="toolbarButton toolbarButtonNew" execute="@this"
+						render="panelDependenteEdicao dataTableDependentes" oncomplete="#{rich:component('modalDependente')}.show(); return false" />
+						
+					<a4j:commandButton value="#{bundle.Pesquisar}"
+						action="#{vendaBB.beneficiarioBB.pesquisar}" execute="gridFiltros messages"
+						rendered="#{vendaBB.beneficiarioBB.modoNovo == 'false' and vendaBB.beneficiarioBB.modoAtualizacao == 'false'}"
+						render="dataTableDependentes"
+						styleClass="toolbarButton toolbarButtonFind" />
+						
+				</rich:toolbar>
+				
+				<div style="height: 5px;" />
+				
+				<h:panelGrid id="gridFiltros" columns="6">
+							 
+					<h:outputLabel styleClass="label-output" value="#{bundle.label_nome_dependente} :" />
+					<h:inputText value="#{vendaBB.beneficiarioBB.entity.nome}" converter="StringConverter" maxlength="100" styleClass="width98" />
+					
+					<h:outputLabel styleClass="label-output" value="#{bundle.label_grau_parentesco} :" />
+					<h:selectOneMenu value="#{vendaBB.beneficiarioBB.entity.grauParentesco}" converter="GenericConverter" >
+						<f:selectItems value="#{vendaBB.beneficiarioBB.grauParentescoSelectItem}" />
+					</h:selectOneMenu>
+						
+					<h:outputLabel value="#{bundle.label_sexo}:" />
+					<h:selectOneMenu value="#{vendaBB.beneficiarioBB.entity.sexo}">
+						<f:selectItem itemLabel="Selecione..." />
+						<f:selectItems value="#{vendaBB.beneficiarioBB.sexoItens}" var="sexo" 
+											itemLabel="#{sexo}" itemValue="#{sexo.valor}" />
+					</h:selectOneMenu>
+						
+					<h:outputLabel value="#{bundle.label_cpf}:" />
+					<h:inputText value="#{vendaBB.beneficiarioBB.entity.cpf}" onkeypress="mascara(this,cpf);" onkeyup="mascara(this,cpf);"
+							    onkeydown="mascara(this,cpf);" maxlength="14"/>
+
+					<h:outputLabel value="#{bundle.label_data_nascimento}:" />
+					<rich:calendar datePattern="dd/MM/yyyy" inputSize="13" showApplyButton="false" 
+								   value="#{vendaBB.beneficiarioBB.entity.dataNascimento}" >
+					</rich:calendar>
+					
+					<h:outputLabel value="#{bundle.label_rg}:" />
+					<h:inputText value="#{vendaBB.beneficiarioBB.entity.rg}" />
+					
+					<h:outputLabel value="#{bundle.label_profissao}:" />
+					<h:selectOneMenu value="#{vendaBB.beneficiarioBB.entity.profissao}" converter="GenericConverter">
+						<f:selectItems value="#{vendaBB.beneficiarioBB.profissaoSelectItem}" />
+					</h:selectOneMenu>
+	
+					<h:outputLabel value="#{bundle.label_esporte}:" style="visibility:#{vendaBB.showEsporte}" id="labelEsporte"/>
+					<h:selectOneMenu value="#{vendaBB.beneficiarioBB.entity.esporte}" converter="GenericConverter" style="visibility:#{vendaBB.showEsporte}" id="seleciontEsporte">
+						<f:selectItems value="#{vendaBB.beneficiarioBB.esporteSelectItem}" />
+					</h:selectOneMenu>
+
+				</h:panelGrid>
+				
+				<div style="height: 5px;" />
+
+				<h:panelGrid styleClass="width100">
+				
+					<rich:dataTable
+						id="dataTableDependentes"
+						columnClasses="width30, width10, width14, width9, width9, width9, width5, width5"
+						styleClass="width100" rows="13" style="width:100%" iterationStatusVar="it"
+						value="#{vendaBB.beneficiarioBB.dados}" var="dependente">
+
+						<rich:column styleClass="left" sortBy="#{dependente.nome}"
+							sortOrder="#{vendaBB.beneficiarioBB.nomeOrder}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.label_nome_dependente}"
+									render="dataTableDependentes statusRequest"
+									action="#{vendaBB.beneficiarioBB.sortByNome()}" execute="@this"/>
+							</f:facet>
+							<h:outputText value="#{dependente.nome}" />
+						</rich:column>
+
+						<rich:column styleClass="left" sortBy="#{dependente.grauParentesco.descricao}"
+							sortOrder="#{vendaBB.beneficiarioBB.grauParentescoOrder}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.label_grau_parentesco}"
+									render="dataTableDependentes statusRequest"
+									action="#{vendaBB.beneficiarioBB.sortByGrauParentesco()}" execute="@this"/>
+							</f:facet>
+							<h:outputText value="#{dependente.grauParentesco.descricao}" />
+						</rich:column>
+
+						<rich:column styleClass="left" sortBy="#{dependente.cpf}"
+							sortOrder="#{vendaBB.beneficiarioBB.cpfOrder}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.label_cpf}"
+									render="dataTableDependentes statusRequest"
+									action="#{vendaBB.beneficiarioBB.sortByCpf()}" execute="@this"/>
+							</f:facet>
+							<h:outputText value="#{dependente.cpf}" converter="CpfCnpjConverter"/>
+						</rich:column>
+
+						<rich:column styleClass="left" sortBy="#{dependente.sexo}"
+							sortOrder="#{vendaBB.beneficiarioBB.sexoOrder}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.label_sexo}"
+									render="dataTableDependentes statusRequest"
+									action="#{vendaBB.beneficiarioBB.sortBySexo()}" execute="@this"/>
+							</f:facet>
+							<h:outputText value="#{dependente.sexo}" converter="SexoConverter" />
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{dependente.dataNascimento}"
+							sortOrder="#{vendaBB.beneficiarioBB.dataNascimentoOrder}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.label_data_nascimento}"
+									render="dataTableDependentes statusRequest"
+									action="#{vendaBB.beneficiarioBB.sortByDataNascimento()}" execute="@this"/>
+							</f:facet>
+							<h:outputText value="#{dependente.dataNascimento}" converter="DateConverter" />
+						</rich:column>
+
+						<rich:column styleClass="left" sortBy="#{dependente.profissao.nome}"
+							sortOrder="#{vendaBB.beneficiarioBB.profissaoOrder}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.label_profissao}"
+									render="dataTableDependentes statusRequest"
+									action="#{vendaBB.beneficiarioBB.sortByProfissao()}" execute="@this"/>
+							</f:facet>
+							<h:outputText value="#{dependente.profissao.nome}" />
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{dependente.esporte.nome}" rendered="#{vendaBB.renderEsporte}" id="columnEsporte"
+							sortOrder="#{vendaBB.beneficiarioBB.esporteOrder}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.label_esporte}"
+									render="dataTableDependentes statusRequest"
+									action="#{vendaBB.beneficiarioBB.sortByEsporte()}" execute="@this"/>
+							</f:facet>
+							<h:outputText value="#{dependente.esporte.nome}" />
+						</rich:column>
+						
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.button_editar}" />
+							</f:facet>
+							<a4j:commandLink action="#{vendaBB.beneficiarioBB.chamarPopup(dependente)}"
+								execute="@this" oncomplete="#{rich:component('modalDependente')}.show(); return false;" render="panelDependenteEdicao">
+
+								<h:graphicImage library="images" name="edit.png"
+									alt="#{bundle.button_editar}" title="#{bundle.button_editar}"
+									styleClass="button" />
+							</a4j:commandLink>
+						</rich:column>
+
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.button_excluir}" />
+							</f:facet>
+							<a4j:commandLink action="#{vendaBB.beneficiarioBB.excluir(dependente)}"
+								execute="@this"
+								onclick="if ( confirm( 'Deseja realmente excluir o registro selecionado?' )==false ) {return false;}"
+								render="dataTableDependentes statusRequest valorSelecionado">
+
+								<h:graphicImage library="images" name="delete.png"
+									alt="#{bundle.button_excluir}" title="#{bundle.button_excluir}"
+									styleClass="button" />
+							</a4j:commandLink>
+						</rich:column>
+
+						<!-- footer -->
+						<f:facet name="footer">
+							<rich:dataScroller renderIfSinglePage="false" />
+						</f:facet>
+						
+					</rich:dataTable>
+				</h:panelGrid>
+			</rich:panel>
+	</h:panelGrid>
+	
+	<rich:popupPanel id="modalDependente" width="750" height="400" modal="true" domElementAttachment="form" resizeable="false">
+		
+		<f:facet name="header">
+            <h:outputText value="Adicionar/Editar Dependente" />
+        </f:facet>
+	        
+        <f:facet name="controls">
+            <h:outputLink value="#" onclick="#{rich:component('modalDependente')}.hide();" >
+            	<h:graphicImage  library="images" name="close.png" 
+            					 alt="#{bundle.button_fechar}" 
+            					 title="#{bundle.button_fechar}"
+								 styleClass="button" />
+				<a4j:ajax event="click" listener="#{vendaBB.beneficiarioBB.novoRegistro()}" render="panelListagemDependentes"></a4j:ajax>
+            </h:outputLink>
+        </f:facet>
+                
+			<h:panelGrid id="panelDependenteEdicao" styleClass="width100">
+				
+				<rich:messages id="messagesDependente" errorClass="error" fatalClass="fatal" infoClass="info" warnClass="warn" />
+			
+				<rich:toolbar height="30px" styleClass="width100">
+					<a4j:commandButton value="#{bundle.button_salvar}"
+										action="#{vendaBB.beneficiarioBB.salvar()}"
+										execute="formVenda panelDependenteEdicao"
+										render="dataTableDependentes messagesDependente formVenda:messages panelDependenteEdicao statusRequest valorSelecionado" 
+										styleClass="toolbarButton toolbarButtonSave"
+										oncomplete="if (#{vendaBB.beneficiarioBB.sucesso}) #{rich:component('modalDependente')}.hide();" />
+
+				</rich:toolbar>
+				
+				<div style="height: 5px;" />
+
+				<rich:panel header="#{bundle.label_dados_dependente}"
+					styleClass="width100" bodyClass="padding2">
+
+					<h:panelGrid columns="4" styleClass="width100" columnClasses="width15,,width15">
+					
+						<h:outputLabel styleClass="label-output required" value="#{bundle.label_nome} :" />
+						<h:panelGroup>
+							<h:inputHidden value="#{vendaBB.beneficiarioBB.entity.id}" converter="BigIntegerConverter"/>
+							<h:inputText value="#{vendaBB.beneficiarioBB.entity.nome}" styleClass="width99" maxlength="100"  />
+						</h:panelGroup>
+						
+						<h:outputLabel styleClass="label-output" value="#{bundle.label_grau_parentesco} :" />
+						<h:selectOneMenu value="#{vendaBB.beneficiarioBB.entity.grauParentesco}" converter="GenericConverter" >
+							<f:selectItems value="#{vendaBB.beneficiarioBB.grauParentescoSelectItem}" />
+						</h:selectOneMenu>
+							
+						<h:outputLabel value="#{bundle.label_sexo}:" />
+						<h:selectOneMenu value="#{vendaBB.beneficiarioBB.entity.sexo}" >
+							<f:selectItems value="#{vendaBB.beneficiarioBB.sexoItens}" var="sexo" 
+											itemLabel="#{sexo}" itemValue="#{sexo.valor}" />
+						</h:selectOneMenu>
+							
+						<h:outputLabel value="#{bundle.label_cpf}:" />
+						<h:inputText value="#{vendaBB.beneficiarioBB.entity.cpf}" onkeypress="mascara(this,cpf);" onkeyup="mascara(this,cpf);"
+							    	 onkeydown="mascara(this,cpf);" maxlength="14" converter="CpfCnpjConverter" />
+	
+						<h:outputLabel value="#{bundle.label_data_nascimento}:" />
+						<rich:calendar datePattern="dd/MM/yyyy" inputSize="13" showApplyButton="false" 
+									   value="#{vendaBB.beneficiarioBB.entity.dataNascimento}" converter="DateConverter" >
+							<a4j:ajax event="change" render="idadeDependente" listener="#{vendaBB.beneficiarioBB.calcularIdade}" execute="@this" />
+						</rich:calendar>
+						
+						<h:outputLabel value="#{bundle.label_idade}:" />
+						<h:inputText disabled="true" value="#{vendaBB.beneficiarioBB.idade}" id="idadeDependente" styleClass="width20"/>
+						
+						<h:outputLabel value="#{bundle.label_rg}:" />
+						<h:inputText value="#{vendaBB.beneficiarioBB.entity.rg}" maxlength="15" />
+							
+						<h:outputLabel value="#{bundle.label_orgao_expedidor}:" />
+						<h:inputText value="#{vendaBB.beneficiarioBB.entity.orgaoExpedidor}" maxlength="10" />
+		
+						<h:outputLabel value="#{bundle.label_data_expedicao}:" />
+						<rich:calendar datePattern="dd/MM/yyyy" inputSize="13" showApplyButton="false"
+								   value="#{vendaBB.beneficiarioBB.entity.dataExpedicao}" converter="DateConverter" />
+						
+						<h:outputLabel value="#{bundle.label_profissao}:" />
+						<h:selectOneMenu id="profissaoBeneficiarioSelec" value="#{vendaBB.beneficiarioBB.entity.profissao}" converter="GenericConverter" >
+							<f:selectItems value="#{vendaBB.beneficiarioBB.profissaoSelectItem}" />
+							<a4j:ajax event="valueChange" render="invalidezCheckDependente" listener="#{vendaBB.beneficiarioBB.atualizarInvalidezCombo}" execute="@this"/>
+						</h:selectOneMenu>
+						
+						<h:outputLabel value="#{bundle.label_aposentado_invalidez}" />
+						<h:selectBooleanCheckbox value="#{vendaBB.beneficiarioBB.entity.flagAposentadoInvalidez}" id="invalidezCheckDependente" >
+							<a4j:ajax event="valueChange" render="profissaoBeneficiarioSelec" listener="#{vendaBB.beneficiarioBB.atualizarInvalidez}" execute="@this"/>
+						</h:selectBooleanCheckbox>						
+						
+						<h:outputLabel value="#{bundle.label_esporte}:" style="visibility:#{vendaBB.showEsporte}" id="labelNovoEsporte"/>
+						<h:selectOneMenu value="#{vendaBB.beneficiarioBB.entity.esporte}" converter="GenericConverter" style="visibility:#{vendaBB.showEsporte}" id="selectionNovoEsporte">
+							<f:selectItems value="#{vendaBB.beneficiarioBB.esporteSelectItem}" />
+						</h:selectOneMenu>
+						
+						<h:outputLabel value="#{bundle.label_portador_hiv}:" style="visibility:#{vendaBB.beneficiarioBB.showHiv}"/>
+						<h:selectOneRadio value="#{vendaBB.beneficiarioBB.entity.flagHiv}" style="visibility:#{vendaBB.beneficiarioBB.showHiv}">
+							<f:selectItem itemValue="true" itemLabel="#{bundle.label_sim}:" />
+							<f:selectItem itemValue="false" itemLabel="#{bundle.label_nao}:" />
+						</h:selectOneRadio>
+						
+					</h:panelGrid>
+				</rich:panel>
+			</h:panelGrid>
+		</rich:popupPanel>
+</rich:panel>
+		
+							
+	</rich:panel>
+	
+</ui:composition>

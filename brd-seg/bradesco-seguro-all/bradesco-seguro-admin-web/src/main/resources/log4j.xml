@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p %d{dd/MM/yyyy HH:mm:ss,SSS} (%c{10}): %m%n" />
+		</layout>
+	</appender>
+
+	<appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="logs/bradesco-seguro-admin-web.log" />
+		<param name="DatePattern" value="'.'yyyy-MM-dd" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p %d{dd/MM/yyyy HH:mm:ss,SSS} (%c{10}): %m%n" />
+		</layout>
+	</appender>
+
+	<loggers>
+		<logger name="br.com.callink">
+			<level value="${br.com.callink.logger.level}" />
+			<appender-ref ref="STDOUT" />
+			<appender-ref ref="FILE" />
+		</logger>
+		<root level="INFO">
+			<appender-ref ref="STDOUT" />
+		</root>
+	</loggers>
+</log4j:configuration>

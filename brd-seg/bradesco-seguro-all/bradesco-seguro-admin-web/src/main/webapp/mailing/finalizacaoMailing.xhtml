@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/WEB-INF/templates/template.xhtml">
+
+	<ui:define name="head">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	</ui:define>
+
+	<ui:define name="body">
+		<h:panelGrid styleClass="width100">
+			<a4j:jsFunction name="initPage" action="#" execute="@none" />
+
+			<rich:panel id="panelListagemMailing" header="#{bundle.LBL_listagemMailing}" styleClass="height100">
+
+				<rich:messages id="messages" errorClass="error" fatalClass="fatal" infoClass="info" warnClass="warn" />
+
+				<rich:toolbar height="30px">
+				
+					<a4j:commandButton value="#{bundle.Pesquisar}"
+						action="#{loteMailingBB.pesquisar}" execute="gridFiltros"
+						rendered="#{loteMailingBB.modoNovo == 'false' and loteMailingBB.modoAtualizacao == 'false'}"
+						render="dataTableMailing"
+						styleClass="toolbarButton toolbarButtonFind" />
+						
+				</rich:toolbar>
+				
+				<div style="height: 5px;" />
+
+				
+					<h:panelGrid id="gridFiltros" styleClass="width100"
+								 cellspacing="2" cellpadding="2"
+								 columns="4" columnClasses="width10, width40, width10, width40">
+								 
+								 <h:outputText styleClass="label-output" value="#{bundle.LBL_finalizado} :" />
+								<h:selectOneMenu value="#{loteMailingBB.flagFinalizado}">
+									<f:selectItems value="#{loteMailingBB.simNaoList}"/>
+								</h:selectOneMenu>
+								 
+					</h:panelGrid>
+					
+					<div style="height: 5px;" />
+
+
+				<h:panelGrid styleClass="width100">
+				
+					<rich:dataTable
+						id="dataTableMailing"
+						columnClasses="width5, width5, width20, width30, width9, width9, width5, width5"
+						styleClass="width100" rows="13" style="width:100%" iterationStatusVar="it"
+						value="#{loteMailingBB.dados}" var="mailing">
+
+						<rich:column styleClass="right" sortBy="#{mailing.id}" 
+									sortOrder="#{loteMailingBB.getSortOrder('ID')}" >
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_id_lote_mailing}" 
+											render="dataTableMailing"
+											action="#{loteMailingBB.sortBy('ID')}"/>
+							</f:facet>
+							<h:outputText value="#{mailing.id}" converter="BigIntegerConverter"/>
+						</rich:column>
+
+						<rich:column styleClass="left" sortBy="#{mailing.idCampanha}" 
+									sortOrder="#{loteMailingBB.getSortOrder('ID_CAMPANHA')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_id_campanha}" 
+											render="dataTableMailing"
+											action="#{loteMailingBB.sortBy('ID_CAMPANHA')}"/>
+							</f:facet>
+							<h:outputText value="#{mailing.idCampanha}"/>
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{mailing.nomeMailing}" 
+									sortOrder="#{loteMailingBB.getSortOrder('NOME')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_nome}" 
+											render="dataTableMailing"
+											action="#{loteMailingBB.sortBy('NOME')}"/>
+							</f:facet>
+							<h:outputText value="#{mailing.nomeMailing}" />
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{mailing.designacao}" 
+									sortOrder="#{loteMailingBB.getSortOrder('DESIGNACAO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_designacao}" 
+											render="dataTableMailing"
+											action="#{loteMailingBB.sortBy('DESIGNACAO')}"/>
+							</f:facet>
+							<h:outputText value="#{mailing.designacao}"/>
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{mailing.quantidadeImportada}" 
+									sortOrder="#{loteMailingBB.getSortOrder('QTD_IMPORTADA')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_quantidade_importada}" 
+											render="dataTableMailing"
+											action="#{loteMailingBB.sortBy('QTD_IMPORTADA')}"/>
+							</f:facet>
+							<h:outputText value="#{mailing.quantidadeImportada}"/>
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{mailing.quantidadeRejeitada}" 
+									sortOrder="#{loteMailingBB.getSortOrder('QTD_REJEITADA')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_quantidade_rejeitada}" 
+											render="dataTableMailing"
+											action="#{loteMailingBB.sortBy('QTD_REJEITADA')}"/>
+							</f:facet>
+							<h:outputText value="#{mailing.quantidadeRejeitada}"/>
+						</rich:column>
+						
+						
+						
+						<rich:column styleClass="left" sortBy="#{mailing.dataInicioMailing}" 
+									sortOrder="#{loteMailingBB.getSortOrder('DATA_INICIO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_data_inicio_mailing}" 
+											render="dataTableMailing"
+											action="#{loteMailingBB.sortBy('DATA_INICIO')}"/>
+							</f:facet>
+							<h:outputText value="#{mailing.dataInicioMailing}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+	                        </h:outputText>
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{mailing.dataFimMailing}" 
+									sortOrder="#{loteMailingBB.getSortOrder('DATA_FIM')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_data_fim_mailing}" 
+											render="dataTableMailing"
+											action="#{loteMailingBB.sortBy('DATA_FIM')}"/>
+							</f:facet>
+							<h:outputText value="#{mailing.dataFimMailing}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+	                        </h:outputText>
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{mailing.flagEnabled}" 
+									sortOrder="#{loteMailingBB.getSortOrder('ATIVO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_ativo}" 
+											render="dataTableMailing"
+											action="#{loteMailingBB.sortBy('ATIVO')}"/>
+							</f:facet>
+							<h:outputText value="#{mailing.flagEnabled}" converter="SimNaoConverter" />
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{mailing.flagMailingFinalizado}" 
+									sortOrder="#{loteMailingBB.getSortOrder('FINALIZACAO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_finalizado}" 
+											render="dataTableMailing"
+											action="#{loteMailingBB.sortBy('FINALIZACAO')}"/>
+							</f:facet>
+							<h:outputText value="#{mailing.flagMailingFinalizado}" converter="SimNaoConverter" />
+						</rich:column>
+
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_finalizar}" />
+							</f:facet>
+							<a4j:commandLink rendered="#{mailing.flagMailingFinalizado eq false}" action="#{loteMailingBB.finalizar(mailing)}"
+								execute="@this" render="dataTableMailing">
+
+								<h:graphicImage library="imagens" name="aplicar.png"
+									alt="#{bundle.LBL_finalizar}" title="#{bundle.LBL_finalizar}"
+									styleClass="button" />
+							</a4j:commandLink>
+						</rich:column>
+
+						<!-- footer -->
+						<f:facet name="footer">
+							<rich:dataScroller renderIfSinglePage="false" />
+						</f:facet>
+						
+					</rich:dataTable>
+				</h:panelGrid>
+			</rich:panel>
+	</h:panelGrid>
+
+	
+	<ui:remove>
+		<rich:popupPanel id="modalMailing" width="820" height="560" modal="true" domElementAttachment="form" resizeable="false">
+			
+			
+			<f:facet name="header">
+	            <h:outputText rendered="#{loteMailingBB.entity.id eq null or loteMailingBB.entity.id eq 0}" value="Adicionar" />
+	            <h:outputText rendered="#{loteMailingBB.entity ne null and loteMailingBB.entity.id ne null and loteMailingBB.entity.id ne 0}" value="Editar" />
+	        </f:facet>
+		        
+	        <f:facet name="controls">
+	            <h:outputLink value="#" onclick="#{rich:component('modalMailing')}.hide(); return false;">
+	            	<h:graphicImage  library="imagens" name="close.png" 
+	            					 alt="#{bundle.LBL_fechar}" 
+	            					 title="#{bundle.LBL_fechar}"
+									 styleClass="button" />
+	            </h:outputLink>
+	        </f:facet>
+	        
+			<rich:messages id="messagesEvento" errorClass="error"
+				fatalClass="fatal" infoClass="info" warnClass="warn" />
+				
+				<h:panelGrid id="panelMailing" styleClass="width100">
+				
+					<rich:toolbar height="30px" styleClass="width100">
+					
+							<a4j:commandButton value="#{bundle.Salvar}"
+												action="#{loteMailingBB.salvar}"
+												execute="@form"
+												render="dataTableMailing panelMailing messagesEvento statusRequest" 
+												styleClass="toolbarButton toolbarButtonSave"
+												oncomplete="if (#{loteMailingBB.sucesso}) #{rich:component('modalMailing')}.hide();"
+												rendered="#{loteMailingBB.entity.id eq null or loteMailingBB.entity.id eq 0}" />
+							<a4j:commandButton value="#{bundle.Atualizar}"
+												action="#{loteMailingBB.atualizar}"
+												execute="@form"
+												render="dataTableMailing panelMailing messagesEvento statusRequest" 
+												styleClass="toolbarButton toolbarButtonSave"
+												oncomplete="if (#{loteMailingBB.sucesso}) #{rich:component('modalMailing')}.hide();"
+												rendered="#{loteMailingBB.entity ne null and loteMailingBB.entity.id ne null and loteMailingBB.entity.id ne 0}" />
+	
+					</rich:toolbar>
+					
+					<div style="height: 5px;" />
+					
+	
+					<rich:panel header="#{bundle.LBL_dados_mailing}"
+						styleClass="width100" bodyClass="padding2">
+	
+						<h:panelGrid columns="2" columnClasses="width20,width80" styleClass="width100">
+						
+							<h:outputLabel styleClass="label-output" value="#{bundle.LBL_produto} :" />
+							<h:selectOneMenu value="#{loteMailingBB.entity.produto}" converter="ProdutoConverter">
+								<f:selectItems value="#{loteMailingBB.produtoSelectItem}" />
+								<f:ajax listener="#{loteMailingBB.changeProduto}" render="panelMailing" />
+							</h:selectOneMenu>
+							
+							<h:outputLabel rendered="#{loteMailingBB.entity.produto ne null}" styleClass="label-output" value="#{bundle.LBL_tipoMailing} :" />
+							<h:selectOneMenu rendered="#{loteMailingBB.entity.produto ne null}" value="#{loteMailingBB.entity.tipoMailing}" converter="TipoMailingConverter">
+								<f:selectItems value="#{loteMailingBB.tipoMailingSelectItem}" />
+							</h:selectOneMenu>
+							
+							<h:outputText rendered="#{loteMailingBB.validacao2}" styleClass="label-output mandatory" value="#{bundle.LBL_faixa_etaria} :" />
+							<h:panelGroup rendered="#{loteMailingBB.validacao2}">
+								<h:inputText value="#{loteMailingBB.entity.faixaEtariaInicial}" onkeypress="return soNumeros();" styleClass="width5" maxlength="3" length="3" />
+								<h:outputText rendered="#{loteMailingBB.validacao2}" styleClass="label-output mandatory" value=" a " />
+								<h:inputText value="#{loteMailingBB.entity.faixaEtariaFinal}" onkeypress="return soNumeros();" styleClass="width5" maxlength="3" length="3" />
+							</h:panelGroup>
+							
+						
+							<h:outputText rendered="#{loteMailingBB.entity.produto ne null}" styleClass="label-output mandatory" value="#{bundle.LBL_codigo} :" />
+							<h:panelGroup rendered="#{loteMailingBB.entity.produto ne null}" >
+								<h:inputHidden value="#{loteMailingBB.entity.id}" converter="BigIntegerConverter"/>
+								<h:inputHidden value="#{loteMailingBB.entity.flagRemoved}"/>
+								<h:inputText value="#{loteMailingBB.entity.codigo}" styleClass="width100" maxlength="100" />
+							</h:panelGroup>
+							
+							<h:outputText rendered="#{loteMailingBB.entity.produto ne null}" styleClass="label-output mandatory" value="#{bundle.LBL_nome} :" />
+							<h:panelGroup rendered="#{loteMailingBB.entity.produto ne null}" >
+								<h:inputText value="#{loteMailingBB.entity.nome}" styleClass="width100" maxlength="50">
+									<f:validateLength maximum="50" minimum="1"/>
+								</h:inputText>
+							</h:panelGroup>
+							
+							
+							<h:outputText rendered="#{loteMailingBB.entity.produto ne null}" styleClass="label-output mandatory" value="#{bundle.LBL_sigla} :" />
+							<h:panelGroup rendered="#{loteMailingBB.entity.produto ne null}" >
+								<h:inputText value="#{loteMailingBB.entity.sigla}" styleClass="width20" maxlength="10" />
+							</h:panelGroup>
+							
+							<h:outputText rendered="#{loteMailingBB.entity.produto ne null}" styleClass="label-output mandatory" value="#{bundle.LBL_capital_segurado} :" />
+							<h:panelGroup rendered="#{loteMailingBB.entity.produto ne null}">
+								<h:inputText value="#{loteMailingBB.entity.capitalSegurado}" onkeypress="return soNumeros();" styleClass="width20" maxlength="11"/>
+							</h:panelGroup>
+							
+							<h:outputText rendered="#{loteMailingBB.validacao1}" styleClass="label-output mandatory" value="#{bundle.LBL_valor_premio} :" />
+							<h:panelGroup rendered="#{loteMailingBB.validacao1}" >
+								<h:inputText value="#{loteMailingBB.entity.valorPremio}" onkeypress="return soNumeros();" styleClass="width20" maxlength="11"/>
+							</h:panelGroup>
+							
+							<h:outputText rendered="#{loteMailingBB.validacao2}" styleClass="label-output mandatory" value="#{bundle.LBL_valor_titular} :" />
+							<h:panelGroup rendered="#{loteMailingBB.validacao2}" >
+								<h:inputText value="#{loteMailingBB.entity.valorTitular}" onkeypress="return soNumeros();" styleClass="width20" maxlength="11"/>
+							</h:panelGroup>
+							
+							<h:outputText rendered="#{loteMailingBB.validacao2}" styleClass="label-output" value="#{bundle.LBL_valor_titular_conjuge} :" />
+							<h:panelGroup rendered="#{loteMailingBB.validacao2}" >
+								<h:inputText value="#{loteMailingBB.entity.valorTitularConjuge}" onkeypress="return soNumeros();" styleClass="width20" maxlength="11"/>
+							</h:panelGroup>
+							
+							<h:outputText rendered="#{loteMailingBB.validacao2}" styleClass="label-output" value="#{bundle.LBL_valor_por_filho} :" />
+							<h:panelGroup rendered="#{loteMailingBB.validacao2}" >
+								<h:inputText value="#{loteMailingBB.entity.valorPorFilho}" onkeypress="return soNumeros();" styleClass="width20" maxlength="11"/>
+							</h:panelGroup>
+							
+							
+							
+							<h:outputText rendered="#{loteMailingBB.entity.produto ne null}" styleClass="label-output mandatory" value="#{bundle.LBL_data_inicio_vigencia}:" />
+		                    <rich:calendar rendered="#{loteMailingBB.entity.produto ne null}" id="selectDataInicioVigencia" value="#{loteMailingBB.entity.dataInicioVigencia}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width100"/>
+		                    
+							<h:outputText rendered="#{loteMailingBB.entity.produto ne null}" styleClass="label-output" value="#{bundle.LBL_data_final_vigencia}:" />
+		                    <rich:calendar rendered="#{loteMailingBB.entity.produto ne null}" id="selectDataFinalVigencia" value="#{loteMailingBB.entity.dataFinalVigencia}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width100"/>
+		                    
+		                    <h:outputText rendered="#{loteMailingBB.entity.produto ne null}" styleClass="label-output" value="#{bundle.LBL_ativo} ?" />	
+							<h:selectBooleanCheckbox rendered="#{loteMailingBB.entity.produto ne null}" value="#{loteMailingBB.entity.flagEnabled}" />
+							
+						</h:panelGrid>
+					</rich:panel>
+				</h:panelGrid>
+			</rich:popupPanel>
+			</ui:remove>
+		</ui:define>
+</ui:composition>

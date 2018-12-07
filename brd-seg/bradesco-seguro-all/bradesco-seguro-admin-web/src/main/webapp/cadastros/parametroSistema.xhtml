@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/WEB-INF/templates/template.xhtml">
+
+	<ui:define name="head">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	</ui:define>
+
+	<ui:define name="body">
+		<a4j:jsFunction name="initPage" action="#" execute="@none" />
+		
+		<rich:messages id="messages" errorClass="error" fatalClass="fatal"
+			infoClass="info" warnClass="warn" />
+			
+		<!-- form -->
+		<rich:panel styleClass="formPanel">
+			<h:panelGrid columns="2" styleClass="panelGrid" columnClasses="left">
+				<h:outputText styleClass="formLabel" value="#{bundle.LBL_nome}:" />
+				<h:outputText  styleClass="formField" value="#{parametroSistemaBB.entity.nomeParametroSistema}" rendered="#{parametroSistemaBB.modoNovo == 'false' and parametroSistemaBB.modoAtualizacao == 'true'}" />
+				<h:inputText  styleClass="formField" value="#{parametroSistemaBB.entity.nomeParametroSistema}" maxlength="100" rendered="#{parametroSistemaBB.modoNovo == 'true' || (parametroSistemaBB.modoNovo == 'false' and parametroSistemaBB.modoAtualizacao == 'false')}" />
+						
+				<h:outputText styleClass="formLabel" value="#{bundle.Valor}:" />
+				<h:inputText  styleClass="formField" value="#{parametroSistemaBB.entity.valorParametroSistema}" maxlength="255" />
+				
+				<h:outputText styleClass="formLabel" value="#{bundle.Descricao}:" />
+				<h:inputText styleClass="formField" value="#{parametroSistemaBB.entity.descricao}" maxlength="100" />
+				
+				<h:outputLabel styleClass="label-output" value="#{bundle.LBL_paramentro_admin}?" 
+							   rendered="#{parametroSistemaBB.usuarioAdminParametroSistema}" />
+				<h:selectBooleanCheckbox value="#{parametroSistemaBB.entity.flagAdminRole}" 
+							   rendered="#{parametroSistemaBB.usuarioAdminParametroSistema}"/>
+		
+			</h:panelGrid>
+		</rich:panel>
+		
+		<div style="height: 5px;" />
+		
+		<!-- crud operations -->
+		<rich:toolbar styleClass="width100 center">
+			<h:panelGrid columns="4">
+				<a4j:commandButton value="#{bundle.Salvar}" styleClass="toolbarButton toolbarButtonSave" rendered="#{parametroSistemaBB.modoNovo == 'true' and parametroSistemaBB.modoAtualizacao == 'false'}" action="#{parametroSistemaBB.salvar}" execute="@form" render="@form" />
+				<a4j:commandButton value="#{bundle.Alterar}" styleClass="toolbarButton toolbarButtonAtualizaLista" rendered="#{parametroSistemaBB.modoAtualizacao == 'true'}" action="#{parametroSistemaBB.atualizar}" execute="@form" render="@form" />
+				<a4j:commandButton value="#{bundle.Cancelar}" styleClass="toolbarButton" rendered="#{parametroSistemaBB.modoAtualizacao == 'true' || parametroSistemaBB.modoNovo == 'true'}" action="#{parametroSistemaBB.cancelar}" execute="@form" render="@form" />
+				<a4j:commandButton value="#{bundle.Novo}" styleClass="toolbarButton toolbarButtonNew" rendered="#{parametroSistemaBB.modoNovo == 'false' and parametroSistemaBB.modoAtualizacao == 'false'}" action="#{parametroSistemaBB.novo}" execute="@form" render="@form" />
+				<a4j:commandButton value="#{bundle.Pesquisar}" styleClass="toolbarButton toolbarButtonFind" rendered="#{parametroSistemaBB.modoNovo == 'false' and parametroSistemaBB.modoAtualizacao == 'false'}" onclick="$(this).attr('disabled','disabled');" oncomplete="$(this).removeAttr('disabled');" disabled="#{parametroSistemaBB.modoAtualizacao == 'true'}" action="#{parametroSistemaBB.pesquisar}" title="#{bundle.Hint_Pesquisar}" execute="@form" render="@form" />
+			</h:panelGrid>
+		</rich:toolbar>
+	
+		<div style="height: 5px;" />
+
+		<!-- data -->
+		<rich:dataTable 
+			id="mainDataTable" 
+			value="#{parametroSistemaBB.dados}"
+			var="current" 
+			noDataLabel="#{bundle.Nenhum_Registro}"
+			rows="10"
+			rowClasses="rowOdd, rowEven"
+			rendered="#{! empty parametroSistemaBB.dados}">
+			
+			<!-- custom columns -->
+			<rich:column styleClass="center">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.Codigo}"/>
+				</f:facet>
+				<h:outputText value="#{current.id}" />
+			</rich:column>
+			
+			<rich:column styleClass="left" style="width:15%">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.LBL_nome}"/>
+				</f:facet>
+				<h:outputText value="#{current.nomeParametroSistema}" />
+			</rich:column>
+			
+			<rich:column styleClass="left" style="width:55%">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.Descricao}" />
+				</f:facet>
+				<h:outputText value="#{current.descricao}" />
+			</rich:column>
+			
+			<rich:column styleClass="center" style="width:20%">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.Valor}" />
+				</f:facet>
+				<h:outputText value="#{current.valorParametroSistema}" />
+			</rich:column>
+			<rich:column styleClass="center" style="width:20%">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.LBL_paramentro_admin}?" />
+				</f:facet>
+				<h:outputText value="#{current.flagAdminRole}" converter="SimNaoConverter" />
+			</rich:column>
+			
+			<!-- action columns -->
+			<rich:column styleClass="center gridActionColumn">
+				<f:facet name="header">
+					<h:outputText styleClass="gridActionLabel" value="#{bundle.Editar}" />
+				</f:facet>
+				<a4j:commandLink action="#{parametroSistemaBB.editar(current)}"
+					execute="@this" render="@form">
+					<h:graphicImage styleClass="image noBorder" library="imagens" name="edit.png" title="#{bundle.Hint_Editar}" />
+				</a4j:commandLink>
+			</rich:column>
+			
+			<!-- footer -->
+			<f:facet name="footer">
+				<rich:dataScroller renderIfSinglePage="false" />
+			</f:facet>
+		</rich:dataTable>
+	</ui:define>
+</ui:composition>

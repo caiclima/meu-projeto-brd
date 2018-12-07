@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="3.0"
+         xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+    <display-name>bradesco-seguro-web</display-name>
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>/faces/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet-mapping>
+		<servlet-name>Faces Servlet</servlet-name>
+		<url-pattern>*.xhtml</url-pattern>
+	</servlet-mapping>
+	
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>All resources</web-resource-name>
+			<description>Protects all cache resources</description>
+			<url-pattern>/cache/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
+	<login-config>
+		<auth-method>BASIC</auth-method>
+		<realm-name>Realm</realm-name>
+	</login-config>
+	<security-role>
+		<role-name>admin</role-name>
+	</security-role>
+	
+	<context-param>
+		<param-name>RichfacesResourceCacheTimeout</param-name>
+		<param-value>86400</param-value>
+	</context-param>
+	
+    <context-param>
+        <param-name>com.sun.faces.writeStateAtFormEnd</param-name>
+        <param-value>false</param-value>
+    </context-param>
+    
+    <context-param>
+        <param-name>javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>javax.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    
+    <context-param>
+		<param-name>com.sun.faces.disableVersionTracking</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>org.richfaces.skin</param-name>
+		<param-value>ruby</param-value>
+	</context-param>
+
+    <session-config>
+        <session-timeout>60</session-timeout>
+    </session-config>
+    
+    <welcome-file-list>
+        <welcome-file>faces/venda.xhtml</welcome-file>
+    </welcome-file-list>
+    
+    <!--ERROR PAGES-->
+	<error-page>
+		<exception-type>br.com.callink.bradesco-seguro.web.exception.MissingParameterException</exception-type>
+		<location>/faces/erros/erroMissingParameter.xhtml</location>
+	</error-page>
+	<error-page>
+		<exception-type>java.lang.UnexpectedException</exception-type>
+		<location>/faces/erros/erro.xhtml</location>
+	</error-page>
+
+	<error-page>
+		<error-code>404</error-code>
+		<location>/faces/erros/erro404.xhtml</location>
+	</error-page>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/faces/erros/erro404.xhtml</location>
+	</error-page>
+</web-app>

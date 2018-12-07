@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<h:outputStylesheet library="css" name="styleSheet.css" />
+	<h:outputScript library="js" target="head" name="Mascara.js"  />
+</h:head>
+<h:body styleClass="lineHeight">
+
+	<!-- form -->
+	<h:form>
+		<f:metadata>
+		    <f:viewParam id="callURL" name="callURL" value="#{consultaClienteAtendimentoBB.callURL}"/>
+		    <f:viewParam id="UserID" name="UserID" value="#{consultaClienteAtendimentoBB.userID}"/>
+		</f:metadata>
+	
+		<p><rich:messages styleClass="messages"/></p>
+			
+		<rich:panel styleClass="formPanel" header="#{bundle.LBL_Pesquisa_cliente}" >
+			<h:panelGrid columns="2" styleClass="panelGrid" columnClasses="left">
+				<h:outputText styleClass="formLabel" value="#{bundle.Nome}:" />
+				<h:inputText styleClass="formField"
+					value="#{consultaClienteAtendimentoBB.nome}" maxlength="100" />
+
+				<h:outputText styleClass="formLabel" value="#{bundle.CNPJ}:" />
+				<h:inputText styleClass="formField"
+					value="#{consultaClienteAtendimentoBB.cnpj}" maxlength="18"
+							onkeydown="mascara(this,cnpj);" onkeypress="mascara(this,cnpj);" onkeyup="mascara(this,cnpj);" />
+			</h:panelGrid>
+		</rich:panel>
+
+		<!-- crud operations -->
+		<rich:toolbar styleClass="width100 center">
+			<h:panelGrid columns="4">
+				<a4j:commandButton value="#{bundle.Pesquisar}"
+					onclick="$(this).attr('disabled','disabled');"
+					oncomplete="$(this).removeAttr('disabled');"
+					action="#{consultaClienteAtendimentoBB.pesquisar}"
+					title="#{bundle.Hint_Pesquisar}" styleClass="toolbarButton toolbarButtonFind" execute="@form" render="@form" />
+				<a4j:commandButton value="#{bundle.Limpar}"
+					action="#{consultaClienteAtendimentoBB.limpar}" execute="@form"
+					render="@form" styleClass="toolbarButton buttonImgClear" />
+				
+				<h:commandButton value="#{bundle.label_Finalizar}" redenred="false"
+					action="#{consultaClienteAtendimentoBB.FinalizarPadrao}"  id="btnFinalizar" 
+					title="#{bundle.Hint_Pesquisar}" styleClass="toolbarButton toolbarButtonFinalizarAtendimento" execute="@form" render="@form">
+			 	</h:commandButton>
+			</h:panelGrid>
+		</rich:toolbar>
+
+		<p></p>
+
+		<!-- data -->
+		<rich:dataTable id="mainDataTable"
+			value="#{consultaClienteAtendimentoBB.dados}" var="current"
+			noDataLabel="#{bundle.Nenhum_Registro}" rows="15"
+			rowClasses="rowOdd, rowEven" styleClass="gridCrud" style="width:100%"
+			rendered="#{! empty consultaClienteAtendimentoBB.dados}">
+
+			<!-- custom columns -->
+			<rich:column styleClass="center" style="width:10%">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.Id_Cliente_Campanha}" />
+				</f:facet>
+				<h:outputText value="#{current.idClienteCampanha}" />
+			</rich:column>
+
+			<rich:column styleClass="left" style="width:35%">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.Nome}" />
+				</f:facet>
+				<h:outputText value="#{current.nome}" />
+			</rich:column>
+
+
+			<rich:column styleClass="center" style="width:45%">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.CNPJ}" />
+				</f:facet>
+				<h:outputText value="#{current.cnpj}" converter="CpfCnpjConverter" />
+			</rich:column>
+			
+			<!-- action columns -->
+			<rich:column styleClass="center gridActionColumn" style="width:10%">
+				<f:facet name="header">
+					<h:outputText styleClass="gridActionLabel" value="Ok" />
+				</f:facet>
+				<h:outputLink value="#{consultaClienteAtendimentoBB.callURL}#{consultaClienteAtendimentoBB.urlAspect}idClienteCampanha=#{current.idClienteCampanha}&amp;cnpj=#{current.cnpj}">Ok</h:outputLink>
+			</rich:column>
+
+			<!-- footer -->
+			<f:facet name="footer">
+				<rich:dataScroller renderIfSinglePage="false" />
+			</f:facet>
+		</rich:dataTable>
+	</h:form>
+</h:body>
+</html>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:a4j="http://richfaces.org/a4j"
+      xmlns:rich="http://richfaces.org/rich"
+      xmlns:c="http://java.sun.com/jstl/core">
+    <h:head>
+        <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE10" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <h:outputStylesheet library="css" name="styleSheet.css" />
+        <h:outputScript library="js" target="head" name="Mascara.js" />
+        <h:outputScript library="js" target="head" name="script.js" />
+    </h:head>
+
+    <ui:include src="loading.xhtml" />
+
+    <h:body styleClass="lineHeight">
+    	<div id="faixasuperior">
+			<div id="nomesistema">
+				<rich:toolbar>
+					<h:panelGrid columns="2" style="width:800px;"
+						columnClasses="col1_barra, col2_barra">
+						<h:panelGrid columns="2" styleClass="width100"
+							columnClasses="col5_barra_logo, col95_barra_logo">
+							<h:graphicImage library="images" name="bradesco-seguros.jpg" styleClass="assinatura" height="80" />
+						</h:panelGrid>
+					</h:panelGrid>
+				</rich:toolbar>
+			</div>
+		</div>
+         <h:inputHidden value="#{vendaBB.isRejeicao()}"/>
+         
+        <h:form id="formVenda">
+        	<rich:messages id="messagesDadosCliente" errorClass="error" fatalClass="fatal" infoClass="info" warnClass="warn" />
+            <a4j:jsFunction name="validaModal" render="messagesDadosCliente textScriptProduto" action="#{vendaBB.salvar(true)}" 
+            oncomplete="if(#{vendaBB.entity.evento.flagVenda}){ if(#{vendaBB.sucesso}) #{rich:component('modalScriptProdutos')}.show();}" execute="@form"/>
+       
+            <rich:panel>
+<ui:include src="/venda_tabs/dadosCliente.xhtml" />
+
+                <h:outputStylesheet library="css" name="jsfCssOverride.css" />
+            </rich:panel>
+ 		</h:form>
+            
+            <rich:popupPanel id="modalScriptProdutos" resizeable="true" minWidth="500" minHeight="440" modal="true" domElementAttachment="form">
+
+                <f:facet name="header">
+                    <h:outputText value="Script Auditoria" />
+                </f:facet>
+
+                <f:facet name="controls">
+                    <h:outputLink value="#" onclick="#{rich:component('modalScriptProdutos')}.hide(); return false;">
+                        <h:graphicImage  library="images" name="close.png" 
+                                         alt="#{bundle.button_fechar}" 
+                                         title="#{bundle.button_fechar}"
+                                         styleClass="button" />
+                    </h:outputLink>
+                </f:facet>
+                <h:form>
+                    <ui:include src="/venda_tabs/scriptProdutos.xhtml" />
+           		</h:form>
+            </rich:popupPanel>
+            <rich:panel id="iframeRichPanel"
+				style="width:0px;height:0px;visibility: hidden;">
+				<iframe id="iFrameTelefonesClienteLoader"
+					src="#{vendaBB.getUrlTelefonesCliente()}"
+					style="visibility: hidden;"> 
+				</iframe>
+			</rich:panel>
+    </h:body>
+</html>

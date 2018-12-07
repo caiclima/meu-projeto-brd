@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/WEB-INF/templates/template.xhtml"
+	xmlns:cts="http://br.com.callink/components/customs">
+
+	<ui:define name="head">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	</ui:define>
+
+	<ui:define name="body">
+		
+		<h:panelGrid styleClass="width100">
+			
+			<rich:panel id="panelListagemProfissao" header="#{bundle.LBL_listagemProfissao}" styleClass="height100">
+				
+				<rich:messages id="mensagens" errorClass="error" fatalClass="fatal" infoClass="info" warnClass="warn" />
+				
+				<rich:toolbar height="30px">
+				
+					<a4j:commandButton value="#{bundle.Novo}"
+						action="#{profissaoBB.novoRegistro}"
+						styleClass="toolbarButton toolbarButtonNew" execute="@this"
+						render="panelProfissao" oncomplete="#{rich:component('modalProfissao')}.show();" />
+					
+					<a4j:commandButton value="#{bundle.Pesquisar}"
+						action="#{profissaoBB.pesquisar}" execute="gridFiltros messages"
+						render="dataTableProfissoes"
+						styleClass="toolbarButton toolbarButtonFind" />
+						
+				</rich:toolbar>
+				
+				<div style="height: 5px;" />
+	        	
+				<h:panelGrid id="gridFiltros" columns="2" columnClasses="width10,width40" styleClass="width50">
+				
+					<h:outputLabel styleClass="label-output required" value="#{bundle.LBL_nome} :" />
+					<h:inputText value="#{profissaoBB.entity.nome}" styleClass="width100" maxlength="50" />
+					
+					<h:outputLabel styleClass="label-output required" value="#{bundle.LBL_codigo} :" />
+					<h:inputText value="#{profissaoBB.entity.codigo}" styleClass="width100" maxlength="10" />
+					
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_profissao_risco}?" />
+					<h:selectOneMenu value="#{profissaoBB.entity.flagRisco}" >
+						<f:selectItems value="#{profissaoBB.simNaoList}" />
+					</h:selectOneMenu>
+					
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_ativo}" />
+					<h:selectOneMenu value="#{profissaoBB.entity.flagEnabled}" >
+						<f:selectItems value="#{profissaoBB.simNaoList}" />
+					</h:selectOneMenu>
+								 
+					<h:outputLabel styleClass="label-output" value="#{bundle.LBL_codigoExterno} :" />
+					<h:inputText value="#{profissaoBB.entity.codigoExterno}" styleClass="width100" maxlength="20" />
+        		
+        		</h:panelGrid>
+	        	
+			</rich:panel>
+			
+			
+			<div style="height: 5px;" />
+
+				<h:panelGrid styleClass="width100">
+				
+					<rich:dataTable
+						id="dataTableProfissoes"
+						columnClasses="width5, width15, width20, width15, width15, width5, width5, width5, width5"
+						styleClass="width100" rows="13" style="width:100%" 
+						value="#{profissaoBB.dados}" var="profissao">
+						
+						<rich:column styleClass="right">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_idProfissao}"/>
+							</f:facet>
+							<h:outputText value="#{profissao.id}"/>
+						</rich:column>
+						
+						<rich:column sortBy="#{profissao.nome}" 
+								sortOrder="#{profissaoBB.getSortOrder('NOME')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_nome}" 
+												render="dataTableProfissoes"
+												action="#{profissaoBB.sortBy('NOME')}"/>
+							</f:facet>
+							<h:outputText value="#{profissao.nome}"/>
+						</rich:column>
+						
+						<rich:column sortBy="#{profissao.descricao}" 
+								sortOrder="#{profissaoBB.getSortOrder('DESCRICAO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_descricao}" 
+												render="dataTableProfissoes"
+												action="#{profissaoBB.sortBy('DESCRICAO')}"/>
+							</f:facet>
+							<h:outputText value="#{profissao.descricao}"/>
+						</rich:column>
+						
+						<rich:column sortBy="#{profissao.codigo}" 
+								sortOrder="#{profissaoBB.getSortOrder('CODIGO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_codigo}" 
+												render="dataTableProfissoes"
+												action="#{profissaoBB.sortBy('CODIGO')}"/>
+							</f:facet>
+							<h:outputText value="#{profissao.codigo}"/>
+						</rich:column>
+						
+						<rich:column sortBy="#{profissao.codigoExterno}" 
+								sortOrder="#{profissaoBB.getSortOrder('CODIGO_EXTERNO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_codigoExterno}" 
+												render="dataTableProfissoes"
+												action="#{profissaoBB.sortBy('CODIGO_EXTERNO')}"/>
+							</f:facet>
+							<h:outputText value="#{profissao.codigoExterno}"/>
+						</rich:column>
+						
+						<rich:column>
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_profissao_risco}?" />
+							</f:facet>
+							<h:outputText value="#{profissao.flagRisco}" converter="SimNaoConverter" />
+						</rich:column>
+						
+						<rich:column>
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_ativo}?" />
+							</f:facet>
+							<h:outputText value="#{profissao.flagEnabled}" converter="SimNaoConverter" />
+						</rich:column>
+						
+						
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_editar}" />
+							</f:facet>
+							<a4j:commandLink action="#{profissaoBB.editar(profissao)}"
+								execute="@this" oncomplete="#{rich:component('modalProfissao')}.show();" render="panelProfissao">
+
+								<h:graphicImage library="imagens" name="edit.png"
+									alt="#{bundle.LBL_editar}" title="#{bundle.LBL_editar}"
+									styleClass="button" />
+							</a4j:commandLink>
+						</rich:column>
+
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_excluir}" />
+							</f:facet>
+							<a4j:commandLink action="#{profissaoBB.excluir(profissao)}"
+								execute="@this"
+								onclick="if ( confirm( 'Deseja realmente excluir o registro selecionado?' )==false ) {return false;}"
+								render="dataTableProfissoes">
+
+								<h:graphicImage library="imagens" name="delete.png"
+									alt="#{bundle.LBL_excluir}" title="#{bundle.LBL_excluir}"
+									styleClass="button" />
+							</a4j:commandLink>
+						</rich:column>
+						
+						<f:facet name="footer">
+							<rich:dataScroller page="#{profissaoBB.currentPage}"
+								rendered="#{profissaoBB.dados.size() > 0}" />
+						</f:facet>
+						
+					</rich:dataTable>
+					
+				</h:panelGrid>
+			
+		</h:panelGrid>		
+		
+	
+		<h:form id="salvarEditarProfissao">		
+			
+			<rich:popupPanel id="modalProfissao" width="610" height="490" modal="true" domElementAttachment="form" resizeable="false">
+				
+					<f:facet name="header">
+		            	<h:outputText value="#{bundle.LBL_adicionar_editar_profissao}" />
+			        </f:facet>
+				        
+			        <f:facet name="controls">
+			            <h:outputLink value="#" onclick="#{rich:component('modalProfissao')}.hide(); return false;">
+			            	<h:graphicImage  library="imagens" name="close.png" 
+			            					 alt="#{bundle.LBL_fechar}" 
+			            					 title="#{bundle.LBL_fechar}"
+											 styleClass="button" />
+			            </h:outputLink>
+			        </f:facet>
+			        
+			        <rich:messages id="mensagensModalProfissao" errorClass="error" fatalClass="fatal" infoClass="info" warnClass="warn" />
+			        
+			        <h:panelGrid id="panelProfissao" styleClass="width100">
+			        
+			        	<rich:toolbar height="30px" styleClass="width100">
+						
+							<a4j:commandButton value="#{bundle.Salvar}"
+												action="#{profissaoBB.salvar}"
+												execute="salvarEditarProfissao"
+												render="dataTableProfissoes panelProfissao mensagensModalProfissao" 
+												styleClass="toolbarButton toolbarButtonSave"
+												oncomplete="if (#{profissaoBB.sucesso}) #{rich:component('modalProfissao')}.hide();" 
+												rendered="#{profissaoBB.modoNovo}"/>
+							
+							<a4j:commandButton value="#{bundle.Salvar}"
+												action="#{profissaoBB.atualizar()}"
+												execute="salvarEditarProfissao"
+												render="dataTableProfissoes panelProfissao mensagensModalProfissao" 
+												styleClass="toolbarButton toolbarButtonSave"
+												oncomplete="if (#{profissaoBB.sucesso}) #{rich:component('modalProfissao')}.hide();" 
+												rendered="#{profissaoBB.modoAtualizacao}"/>					
+		
+						</rich:toolbar>
+			        	
+			        	<div style="height: 5px;" />
+			        	
+			        	<rich:panel header="#{bundle.LBL_dados_profissao}"
+							styleClass="width100" bodyClass="padding2">
+		
+							<h:panelGrid columns="2" columnClasses="width20,width80" styleClass="width100">
+								
+								<h:outputLabel styleClass="label-output required" value="#{bundle.LBL_nome} :" />
+								<h:panelGroup>
+									<h:inputHidden value="#{profissaoBB.entity.id}" converter="BigIntegerConverter"/>
+									<h:inputText value="#{profissaoBB.entity.nome}" styleClass="width100" maxlength="50"/>
+								</h:panelGroup>
+										 
+								<h:outputLabel styleClass="label-output required" value="#{bundle.LBL_codigo} :" />
+								<h:inputText value="#{profissaoBB.entity.codigo}" styleClass="width100" maxlength="10"/>
+								
+								<h:outputLabel styleClass="label-output" value="#{bundle.LBL_profissao_risco}?" />
+								<h:selectOneMenu value="#{profissaoBB.entity.flagRisco}" >
+									<f:selectItem itemLabel="Sim" itemValue="#{true}" />
+									<f:selectItem itemLabel="Não" itemValue="#{false}" />
+								</h:selectOneMenu>
+								
+								<h:outputLabel styleClass="label-output" value="#{bundle.LBL_ativo}?" />
+								<h:selectOneMenu value="#{profissaoBB.entity.flagEnabled}" >
+									<f:selectItem itemLabel="Sim" itemValue="#{true}" />
+									<f:selectItem itemLabel="Não" itemValue="#{false}" />
+								</h:selectOneMenu>
+											 
+								<h:outputLabel styleClass="label-output" value="#{bundle.LBL_codigoExterno} :" />
+								<h:inputText value="#{profissaoBB.entity.codigoExterno}" styleClass="width100" maxlength="20" />
+			        			
+			        			<h:outputLabel styleClass="label-output required" value="#{bundle.LBL_descricao} :" />
+								<h:inputTextarea value="#{profissaoBB.entity.descricao}" styleClass="width100" rows="5" 
+										onkeyup="if(this.value.length > 1000){this.value = this.value.substring(0, 1000)};">
+									<f:validateLength maximum="1000"></f:validateLength>
+								</h:inputTextarea>
+								
+			        		</h:panelGrid>
+			        	
+			        	</rich:panel>
+			        	
+			        </h:panelGrid>
+				
+			</rich:popupPanel>
+		</h:form>
+	</ui:define>
+</ui:composition>

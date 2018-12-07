@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/WEB-INF/templates/template.xhtml"
+	xmlns:cts="http://br.com.callink/components/customs">
+
+	<ui:define name="head">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	</ui:define>
+
+	<ui:define name="body">
+		<h:panelGrid styleClass="width100">
+			<h:form id="formListagemUsuarios">
+				<a4j:jsFunction name="initPage" action="#" execute="@none" />
+				
+				<rich:panel id="panelListagemUsuarios"
+					header="#{bundle.LBL_listagemUsuarios}" styleClass="height100">
+	
+					<rich:messages id="messages" errorClass="error" fatalClass="fatal"
+						infoClass="info" warnClass="warn" />
+	
+					<rich:toolbar height="30px">
+						<a4j:commandButton value="#{bundle.Pesquisar}"
+							action="#{usuarioBB.filtrar()}" execute="@form"
+							rendered="#{usuarioBB.modoNovo == 'false' and usuarioBB.modoAtualizacao == 'false'}"
+							render="dataTableUsuarios"
+							styleClass="toolbarButton toolbarButtonFind" />
+					</rich:toolbar>
+					
+					<div style="height: 5px;" />
+					
+					<h:panelGrid id="gridFiltros" cellspacing="2" cellpadding="2"
+						columns="2" columnClasses="width30" styleClass="width30">
+						
+						<h:outputLabel styleClass="label-output" value="#{bundle.LBL_nome} :" />
+						<h:inputText value="#{usuarioBB.nome}" converter="StringConverter" maxlength="100" styleClass="width98" />
+							
+						<h:outputLabel styleClass="label-output" value="#{bundle.LBL_ativo} :" />
+						<h:selectOneMenu value="#{usuarioBB.simNaoSelecionado}">
+								<f:selectItems value="#{usuarioBB.simNaoList}" />
+								<f:converter converterId="GenericConverter" />
+						</h:selectOneMenu>
+		
+					</h:panelGrid>
+					
+					<div style="height: 5px;" />
+	
+					<h:panelGrid styleClass="width100">
+						<rich:dataTable
+							columnClasses="width5, width35, width15"
+							id="dataTableUsuarios" styleClass="width100" rows="13"
+							style="width:100%" iterationStatusVar="it" value="#{usuarioBB.dados}" var="current">
+
+							<rich:column styleClass="right" sortBy="#{current.id}" sortOrder="#{usuarioBB.idOrder}">
+								<f:facet name="header">
+									<h:outputText value="#{bundle.LBL_idUsuario}" />
+								</f:facet>
+								<h:outputText value="#{current.id}" converter="BigIntegerConverter"/>
+							</rich:column>
+	
+							<rich:column styleClass="left" sortBy="#{current.nomeUsuario}"
+								sortOrder="#{usuarioBB.nomeOrder}">
+								<f:facet name="header">
+									<a4j:commandLink value="#{bundle.LBL_nome}"
+										render="dataTableUsuarios statusRequest"
+										action="#{usuarioBB.sortByNome()}" />
+								</f:facet>
+								<h:outputText value="#{current.nomeUsuario}" />
+							</rich:column>
+	
+							<rich:column styleClass="left" sortBy="#{current.nomeUsuario}"
+								sortOrder="#{usuarioBB.nomeOrder}">
+								<f:facet name="header">
+									<a4j:commandLink value="#{bundle.Status}"
+										render="dataTableUsuarios statusRequest"
+										action="#{usuarioBB.sortByFlagEnabled()}" />
+								</f:facet>
+								<h:outputText value="#{current.flagEnabled}" converter="FlagEnabledConverter" />
+							</rich:column>
+	
+							<!-- footer -->
+							<f:facet name="footer">
+								<rich:dataScroller renderIfSinglePage="false" />
+							</f:facet>
+						</rich:dataTable>
+					</h:panelGrid>
+				</rich:panel>
+			</h:form>
+		</h:panelGrid>
+	</ui:define>
+</ui:composition>

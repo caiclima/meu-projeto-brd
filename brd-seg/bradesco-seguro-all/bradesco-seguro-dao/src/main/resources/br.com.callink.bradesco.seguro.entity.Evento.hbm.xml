@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	
+	<query name="Evento.buscarEventosNaCampanhaPorTipo">
+		<![CDATA[
+			SELECT DISTINCT evento FROM Evento AS evento INNER JOIN evento.eventoCampanhaList AS eventoCampanha 
+	   		WHERE evento.flagEnabled = :flagEnabled AND eventoCampanha.campanha.id = :idCampanha AND evento.flagRemoved = :flagRemoved
+	   		AND evento.flagImplicitoUsuario = :flagImplicitoUsuario AND evento.tipoEvento.id = :idTipoEvento
+        ]]>
+	</query>
+</hibernate-mapping>

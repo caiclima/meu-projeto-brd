@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:rich="http://richfaces.org/rich">
+
+	<h:form >
+		<div id="menu" class="menu">
+			<rich:toolbar styleClass="menuChild" height="26px" binding="#{menuBB.menuBar}" />
+			<rich:toolbar rendered="false" />
+			<rich:dropDownMenu rendered="false" />
+			<rich:menuItem rendered="false" />
+			<rich:menuGroup rendered="false" />
+		</div>
+		
+		<!-- fix:Internet Explorer 6. Menu nao deve ser sobreposto -->
+		<!-- Para Internet Explorer 6, conteudo vai ser desaparecer -->
+		<!-- enquanto usuario estiver navegando no menu -->
+		<!-- <h:outputScript rendered="#{browserBB.internetExplorer6}">
+			function _menu(element){
+				$(element).mouseover(function(){
+					$('.content').hide();
+				});
+				
+				$(element).focus(function(){
+					$('.content').hide();
+				});
+				    
+				try{
+					element.attachEvent('onmouseleave', function(){
+						setTimeout(function(){ $('.content').show(); }, 1500);
+					});
+				}catch(e){
+					$(element).mouseout(function(){
+						setTimeout(function(){ $('.content').show(); }, 1500);
+					});
+				}
+				
+			}
+		
+			jQuery(document).ready(function($) {
+
+				 $(".menu").each(function(){
+				 	_menu(this);
+				 });
+				 
+				 $(".menuChild").each(function(){
+				 	_menu(this);
+				 	
+				 	 $(this).children().each(function(){
+				 		_menu(this);
+					 });
+				 });
+			});
+		</h:outputScript> -->
+	</h:form>
+</ui:composition>

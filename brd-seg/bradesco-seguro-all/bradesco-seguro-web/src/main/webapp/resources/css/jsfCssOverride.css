@@ -1,0 +1,20 @@
+.rf-edt-c {
+	height: auto;
+}
+.rf-edt-c-cnt {
+	white-space: normal;
+}
+.rf-edt-b {
+	overflow-y: scroll;
+}
+.rf-edt-tbl {
+    width: 100%;
+}
+
+.rf-edt-r-act {
+    font-weight: normal;
+}
+
+.rf-edt-r-sel {
+    background-color: #f8d8d8;
+}

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">  
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"  
+                xmlns:f="http://java.sun.com/jsf/core"              
+                xmlns:h="http://java.sun.com/jsf/html"  
+                xmlns:ui="http://java.sun.com/jsf/facelets"  
+                xmlns:a4j="http://richfaces.org/a4j"  
+                xmlns:rich="http://richfaces.org/rich">
+    <rich:panel>
+     <rich:toolbar height="25px" >
+            <rich:toolbarGroup location="left">
+                <h:outputLabel value="Eventos" />
+            </rich:toolbarGroup>
+            <rich:toolbarGroup location="right">
+                <h:commandButton id="btnFinalizaVenda" action="#{vendaBB.salvar(true)}" value="Finalizar" onclick="validaModal();return #{!vendaBB.entity.evento.flagVenda}" styleClass="toolbarButton toolbarButtonFinalizarAtendimento"
+                				 style="display:#{vendaBB.showFinalizaVenda}" />
+                 <h:commandButton id="btnFinaliza" action="#{vendaBB.salvar(true)}" value="Finalizar" styleClass="toolbarButton toolbarButtonFinalizarAtendimento"
+                				 style="display:#{vendaBB.showFinaliza}" />				 
+                				 
+            </rich:toolbarGroup>
+        </rich:toolbar>
+       
+        <h:panelGrid columns="2" width="100%" columnClasses="width45 alignTop,width55 alignTop" >
+            <rich:extendedDataTable id="tiposEventoDataTable"
+                                    value="#{vendaBB.tipoEventoList}"
+                                    var="tipoEvento" 
+                                    style="width:100%; float: right; height: 146px" 
+                                    selectionMode="single" selection="#{vendaBB.selectionTipoEvento}"
+                                    rowClass="#{tipoEvento.id eq vendaBB.entity.evento.tipoEvento.id ? vendaBB.styleEvento : '' }">
+
+                <a4j:ajax execute="@this" event="selectionchange"
+                          listener="#{vendaBB.selectionTipoEventoListener}"
+                          render="eventosDataTable, btnFinaliza, btnFinalizaVenda"	/>
+
+                <f:facet name="header">
+                    <h:outputLabel value="#{bundle.label_GruposEventos}" />
+                </f:facet>
+
+                <rich:column>
+                    <style>
+                        div.rf-edt[id="formVenda:tiposEventoDataTable"] .rf-edt-c {
+                            width: 100%; 
+                        }
+                    </style>
+                    <h:outputText value="#{tipoEvento.nomeTipoEvento}" styleClass=""
+                                  style="cursor:pointer;font-size:14px;" />
+                </rich:column>
+
+            </rich:extendedDataTable>
+
+            <rich:extendedDataTable id="eventosDataTable"
+                                    value="#{vendaBB.eventoList}"
+                                    var="disposition"
+                                    style="width:100%; float: left;  height: 146px" 
+                                    selectionMode="single" selection="#{vendaBB.selectionEvento}"
+                                    rowClass="#{disposition.id eq vendaBB.entity.evento.id ? vendaBB.styleEvento : '' }">
+
+                <a4j:ajax execute="@this" event="selectionchange" render="btnFinaliza, btnFinalizaVenda"
+                          listener="#{vendaBB.selectionEventoListener}"/>
+                           
+                <f:facet name="header">
+                    <h:outputLabel value="Tipo Evento [ #{vendaBB.tipoEventoSelecionado.nomeTipoEvento} ]" />
+                </f:facet>
+                <rich:column>
+                	<style>
+			            div.rf-edt[id="formVenda:eventosDataTable"] .rf-edt-c {
+			                width: 100%;
+			            }
+			        </style>
+                    <h:outputText value="#{disposition.nomeEvento}"
+                                  style="cursor:pointer;font-size:14px;" />
+                </rich:column>
+            </rich:extendedDataTable>
+        </h:panelGrid>
+    </rich:panel>
+</ui:composition>

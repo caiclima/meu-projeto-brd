@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/WEB-INF/templates/template.xhtml">
+
+	<ui:define name="head">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	</ui:define>
+
+	<ui:define name="body">
+		<h:panelGrid styleClass="width100">
+			<a4j:jsFunction name="initPage" action="#" execute="@none" />
+
+			<rich:panel id="panelListagemProdutos" header="#{bundle.LBL_listagemProdutos}" styleClass="height100">
+
+				<rich:messages id="messages" errorClass="error" fatalClass="fatal" infoClass="info" warnClass="warn" />
+
+				<rich:toolbar height="30px">
+				
+					
+				
+					<a4j:commandButton value="#{bundle.Novo}"
+						action="#{produtoBB.novoRegistro}"
+						styleClass="toolbarButton toolbarButtonNew" execute="@this"
+						render="panelProduto modalProduto" oncomplete="#{rich:component('modalProduto')}.show();" />
+					<a4j:commandButton value="#{bundle.Pesquisar}"
+						action="#{produtoBB.pesquisar}" execute="gridFiltros"
+						rendered="#{produtoBB.modoNovo == 'false' and produtoBB.modoAtualizacao == 'false'}"
+						render="dataTableProdutos"
+						styleClass="toolbarButton toolbarButtonFind" />
+						
+				</rich:toolbar>
+				
+				<div style="height: 5px;" />
+				
+				<h:panelGrid id="gridFiltros" styleClass="width100"
+							 cellspacing="2" cellpadding="2"
+							 columns="4" columnClasses="width10, width40, width10, width40">
+							 
+					<h:outputText styleClass="label-output" value="#{bundle.LBL_descricao} :" />
+					<h:inputText value="#{produtoBB.entity.descricao}" converter="StringConverter" maxlength="100" styleClass="width98" />
+					
+					<h:outputText styleClass="label-output" value="#{bundle.LBL_codigo_produto} :" />
+					<h:inputText value="#{produtoBB.entity.codigo}" converter="StringConverter" maxlength="20" />
+					
+					<h:outputText styleClass="label-output" value="#{bundle.LBL_nome} :" />
+					<h:inputText value="#{produtoBB.entity.nome}" converter="StringConverter" maxlength="20" />
+					
+					<h:outputText styleClass="label-output" value="#{bundle.LBL_sigla} :" />
+					<h:inputText value="#{produtoBB.entity.sigla}" converter="StringConverter" maxlength="20" />
+					
+					<h:outputText styleClass="label-output" value="#{bundle.LBL_tipo_produto} :" />
+						<h:selectOneMenu value="#{produtoBB.entity.codigoValidacaoProduto}">
+							<f:selectItems value="#{produtoBB.tipoProdutoSelectItem}" var="tipoProduto" itemValue="#{tipoProduto.codigo}" itemLabel="#{tipoProduto.nome}" />
+						</h:selectOneMenu>
+						
+					<h:outputText styleClass="label-output" value="#{bundle.LBL_data_inicio_vigencia}:" />
+                    <rich:calendar id="selectDataIniVigencia" value="#{produtoBB.entity.dataInicioVigencia}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width100"/>
+                    
+					<h:outputText styleClass="label-output" value="#{bundle.LBL_data_final_vigencia}:" />
+                    <rich:calendar id="selectDataFimVigencia" value="#{produtoBB.entity.dataFinalVigencia}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width100"/>
+						
+					<h:outputText styleClass="label-output" value="#{bundle.LBL_ativo} :" />
+					<h:selectOneMenu value="#{produtoBB.flagEnabled}">
+						<f:selectItems value="#{produtoBB.simNaoList}"/>
+					</h:selectOneMenu>
+
+				</h:panelGrid>
+				
+				<div style="height: 5px;" />
+
+				<h:panelGrid styleClass="width100">
+				
+					<rich:dataTable
+						id="dataTableProdutos"
+						columnClasses="width5, width35, width14, width9, width9, width9, width5, width5"
+						styleClass="width100" rows="13" style="width:100%" iterationStatusVar="it"
+						value="#{produtoBB.dados}" var="produto">
+
+						<rich:column styleClass="right">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_id_produto}" />
+							</f:facet>
+							<h:outputText value="#{produto.id}" converter="BigIntegerConverter"/>
+						</rich:column>
+
+						<rich:column styleClass="left" sortBy="#{produto.descricao}" 
+									sortOrder="#{produtoBB.getSortOrder('DESCRICAO')}" >
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_descricao}" 
+												render="dataTableProdutos"
+												action="#{produtoBB.sortBy('DESCRICAO')}"/>
+							</f:facet>
+							<h:outputText value="#{produto.descricao}"/>
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{produto.codigo}" 
+									sortOrder="#{produtoBB.getSortOrder('CODIGO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_codigo_produto}" 
+												render="dataTableProdutos"
+												action="#{produtoBB.sortBy('CODIGO')}"/>
+							</f:facet>
+							<h:outputText value="#{produto.codigo}"/>
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{produto.nome}" 
+									sortOrder="#{produtoBB.getSortOrder('NOME')}" >
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_nome}" 
+												render="dataTableProdutos"
+												action="#{produtoBB.sortBy('NOME')}"/>
+							</f:facet>
+							<h:outputText value="#{produto.nome}"/>
+						</rich:column>
+						
+						
+						<rich:column styleClass="left" sortBy="#{produto.dataInicioVigencia}" 
+									sortOrder="#{produtoBB.getSortOrder('DATA_INICIO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_data_inicio_vigencia}" 
+												render="dataTableProdutos"
+												action="#{produtoBB.sortBy('DATA_INICIO')}"/>
+							</f:facet>
+							<h:outputText value="#{produto.dataInicioVigencia}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+	                        </h:outputText>
+						</rich:column>
+						
+						<rich:column styleClass="left" sortBy="#{produto.dataFinalVigencia}" 
+								sortOrder="#{produtoBB.getSortOrder('DATA_FINAL')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_data_final_vigencia}" 
+												render="dataTableProdutos"
+												action="#{produtoBB.sortBy('DATA_FINAL')}"/>
+							</f:facet>
+							<h:outputText value="#{produto.dataFinalVigencia}">
+								<f:convertDateTime pattern="dd/MM/yyyy" />
+	                        </h:outputText>
+						</rich:column>
+
+						<rich:column styleClass="left">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_ativo}" />
+							</f:facet>
+							<h:outputText value="#{produto.flagEnabled}" converter="SimNaoConverter" />
+						</rich:column>
+
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_editar}" />
+							</f:facet>
+							<a4j:commandLink action="#{produtoBB.chamarPopup(produto)}"
+								execute="@this" oncomplete="#{rich:component('modalProduto')}.show();" render="panelProduto modalProduto">
+
+								<h:graphicImage library="imagens" name="edit.png"
+									alt="#{bundle.LBL_editar}" title="#{bundle.LBL_editar}"
+									styleClass="button" />
+							</a4j:commandLink>
+						</rich:column>
+
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_excluir}" />
+							</f:facet>
+							<a4j:commandLink action="#{produtoBB.excluir(produto)}"
+								execute="@this"
+								onclick="if ( confirm( 'Deseja realmente inativar o registro selecionado?' )==false ) {return false;}"
+								render="dataTableProdutos statusRequest">
+
+								<h:graphicImage library="imagens" name="delete.png"
+									alt="#{bundle.LBL_inativar}" title="#{bundle.LBL_inativar}"
+									styleClass="button" />
+							</a4j:commandLink>
+						</rich:column>
+
+						<!-- footer -->
+						<f:facet name="footer">
+							<rich:dataScroller renderIfSinglePage="false" />
+						</f:facet>
+						
+					</rich:dataTable>
+				</h:panelGrid>
+			</rich:panel>
+	</h:panelGrid>
+	<h:form>
+	<rich:popupPanel id="modalProduto" width="610" height="450" modal="true" domElementAttachment="form" resizeable="false">
+		
+		
+		<f:facet name="header">
+            <h:outputText rendered="#{produtoBB.entity.id eq null or produtoBB.entity.id eq 0}" value="Adicionar" />
+            <h:outputText rendered="#{produtoBB.entity ne null and produtoBB.entity.id ne null and produtoBB.entity.id ne 0}" value="Editar" />
+        </f:facet>
+	        
+        <f:facet name="controls">
+            <h:outputLink value="#" onclick="#{rich:component('modalProduto')}.hide(); return false;">
+            	<h:graphicImage  library="imagens" name="close.png" 
+            					 alt="#{bundle.LBL_fechar}" 
+            					 title="#{bundle.LBL_fechar}"
+								 styleClass="button" />
+            </h:outputLink>
+        </f:facet>
+        
+		<rich:messages id="messagesEvento" errorClass="error"
+			fatalClass="fatal" infoClass="info" warnClass="warn" />
+			
+			<h:panelGrid id="panelProduto" styleClass="width100">
+			
+				<rich:toolbar height="30px" styleClass="width100">
+				
+						<a4j:commandButton value="#{bundle.Salvar}"
+											action="#{produtoBB.salvar}"
+											execute="@form"
+											render="dataTableProdutos panelProduto messagesEvento statusRequest" 
+											styleClass="toolbarButton toolbarButtonSave"
+											oncomplete="if (#{produtoBB.sucesso}) #{rich:component('modalProduto')}.hide();"
+											rendered="#{produtoBB.entity.id eq null or produtoBB.entity.id eq 0}" />
+						<a4j:commandButton value="#{bundle.Atualizar}"
+											action="#{produtoBB.atualizar}"
+											execute="@form"
+											render="dataTableProdutos panelProduto messagesEvento statusRequest" 
+											styleClass="toolbarButton toolbarButtonSave"
+											oncomplete="if (#{produtoBB.sucesso}) #{rich:component('modalProduto')}.hide();"
+											rendered="#{produtoBB.entity ne null and produtoBB.entity.id ne null and produtoBB.entity.id ne 0}" />
+
+				</rich:toolbar>
+				
+				<div style="height: 5px;" />
+				
+
+				<rich:panel header="#{bundle.LBL_dados_produto}"
+					styleClass="width100" bodyClass="padding2">
+
+					<h:panelGrid columns="2" columnClasses="width20,width80" styleClass="width100">
+					
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_nome} :" />
+						<h:panelGroup>
+							<h:inputHidden value="#{produtoBB.entity.id}" converter="BigIntegerConverter"/>
+							<h:inputHidden value="#{produtoBB.entity.flagRemoved}"/>
+							<h:inputText value="#{produtoBB.entity.nome}" converter="StringConverter" styleClass="width70" maxlength="50" />
+						</h:panelGroup>
+						
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_sigla} :" />
+						<h:inputText value="#{produtoBB.entity.sigla}" converter="StringConverter" styleClass="width20" maxlength="10" />
+						
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_descricao} :" />
+						<h:inputText value="#{produtoBB.entity.descricao}" styleClass="width100" maxlength="100" />
+						
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_codigo_produto} :" />
+						<h:inputText value="#{produtoBB.entity.codigo}"	converter="StringConverter" styleClass="width70" maxlength="50" />
+							
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_tipo_produto} :" />
+						<h:selectOneMenu value="#{produtoBB.entity.codigoValidacaoProduto}">
+							<f:selectItems value="#{produtoBB.tipoProdutoSelectItem}" var="tipoProduto" itemValue="#{tipoProduto.codigo}" itemLabel="#{tipoProduto.nome}" />
+						</h:selectOneMenu>
+						
+						<h:outputText styleClass="label-output mandatory" value="#{bundle.LBL_data_inicio_vigencia}:" />
+	                    <rich:calendar id="selectDataInicioVigencia" value="#{produtoBB.entity.dataInicioVigencia}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width100"/>
+	                    
+						<h:outputText styleClass="label-output" value="#{bundle.LBL_data_final_vigencia}:" />
+	                    <rich:calendar id="selectDataFinalVigencia" value="#{produtoBB.entity.dataFinalVigencia}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width100"/>
+							
+						<h:outputText styleClass="label-output" value="#{bundle.LBL_ativo} ?" />	
+						<h:selectBooleanCheckbox value="#{produtoBB.entity.flagEnabled}" />
+						
+						
+					</h:panelGrid>
+				</rich:panel>
+			</h:panelGrid>
+		</rich:popupPanel>
+		</h:form>
+	</ui:define>
+</ui:composition>

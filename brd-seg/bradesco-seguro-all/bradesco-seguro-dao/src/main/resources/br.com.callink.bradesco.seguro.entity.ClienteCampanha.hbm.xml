@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	
+	<query name="ClienteCampanha.buscarClienteCampanhaPorId">
+		<![CDATA[
+			SELECT distinct cliente 
+			  FROM ClienteCampanha AS cliente
+	   INNER JOIN FETCH cliente.contatoMailing AS contatoMailing 
+	   INNER JOIN FETCH cliente.telefoneClienteList AS telefoneCliente 
+	   INNER JOIN FETCH cliente.campanha AS campanha
+	    LEFT JOIN FETCH cliente.historicoContatoList AS historicoContato
+	    LEFT JOIN FETCH cliente.vendaList AS venda
+	    LEFT JOIN FETCH venda.beneficiarioList AS beneficiario
+	    LEFT JOIN FETCH beneficiario.beneficiarioPlanoList AS beneficiarioPlano
+	    LEFT JOIN FETCH beneficiarioPlano.plano AS plano
+	    LEFT JOIN FETCH plano.produto AS produto
+			 WHERE cliente.id = :idClienteCampanha
+        ]]>
+	</query>
+</hibernate-mapping>

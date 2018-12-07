@@ -1,0 +1,790 @@
+body {
+	margin: 0 0 100px;
+	background-color: #F9F5F5;
+}
+
+label {
+	font-weight: bold;
+}
+
+img {
+	border: 0px;
+}
+
+caption {
+	background-color: #CCCCCC;
+	font-weight: bold;
+}
+
+fieldset {
+	border: 1px solid #BED6F8;
+	background: #F6F6F6;
+	vertical-align: top;
+}
+
+
+legend {
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.mandatory {
+	font-weight: bold;
+}
+
+.overflow {
+	overflow: auto;
+}
+
+.footer {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	height: 25px;
+	width: 100%;
+}
+
+.logoutLabel {
+	font-size: 25px;
+	font-style: oblique;
+	font-family: Arial, Verdana, sans-serif;
+}
+
+.falha {
+	color: red;
+}
+
+.sucesso {
+	color: #4460C9;
+}
+
+.noborder {
+	border: 0px !important;
+}
+
+.tabDadosRegraNegocio {
+	border: 0px;
+	width: 100%;
+	height: 100%;
+}
+
+.upload {
+	width: 250px;
+	height: 100px;
+}
+
+.floatleft {
+	float: left;
+	margin: 0px 5px 5px 0px;
+}
+
+.floatright {
+	z-index: 10;
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+
+.gridUsuarioLogado{
+	padding: 0px;
+	margin: 0px;
+	width: 100%;
+}
+
+.rf-tb-sep {
+    border: 0 none !important;
+    height: 100% !important;
+    padding: 0 1px !important;
+    text-align: center !important;
+}
+
+.rf-tb-itm {
+    border: 0 none !important;
+    padding: 0 2px !important;
+    white-space: nowrap !important;
+}
+
+.hide {
+	display: none;
+}
+
+
+
+/*----------------------------------------------------------------------------*/
+/*           COMPONENTES AUTO_COMPLETE - AJUSTANDO WIDTH                      */
+/*----------------------------------------------------------------------------*/
+input.rf-au-inp {
+    background-color: #FFFFFF;
+    background-image: url("/comissionamento/rfRes/inputBackgroundImage.png.xhtml?v=4.2.2.Final&db=eAFjZL!AyMDN-P8!4!83X!4B6f!!GZgAYpAKwQ__&ln=org.richfaces.images");
+    background-position: 1px 1px;
+    background-repeat: no-repeat;
+    border: 0 none;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+    width: 360px !important;
+}
+
+.rf-au-lst-dcrtn .rf-au-lst-scrl {
+    max-height: 360px !important;
+    width: 100% !important;
+}
+
+.autocomplete{
+	width: 360px;
+}
+
+
+/*----------------------------------------------------------------------------*/
+/*                                    GRID                                    */
+/*----------------------------------------------------------------------------*/
+.gridActionLabel {
+	text-decoration: underline;
+}
+
+.gridActionColumn {
+	width: 23px;
+}
+
+.messages {
+	font-family: Arial, Verdana, sans-serif;
+	font-size: 12px !important;
+}
+
+.panelGrid {
+	font-family: Arial, Verdana, sans-serif;
+	font-size: 11px;
+}
+
+.image {
+	border: 0px none;
+}
+
+.gridComponente {
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
+/*----------------------------------------------------------------------------*/
+/*                                    ROW                                     */
+/*----------------------------------------------------------------------------*/
+.rowOdd {
+	padding: 0;
+	margin: 0;
+}
+
+.rowEven {
+	background-color: #EEE9E9;
+	padding: 0;
+	margin: 0;
+}
+
+/*----------------------------------------------------------------------------*/
+/*                                    ALIGN                                   */
+/*----------------------------------------------------------------------------*/
+.alignTop {
+	vertical-align: top;
+}
+
+.alignBottom {
+	vertical-align: bottom;
+}
+
+.alignMiddle {
+	vertical-align: middle;
+}
+
+.center {
+	text-align: center;
+}
+
+div.center div,div.center p,div.center table,div.center form {
+	text-align: left;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.left {
+	text-align: left;
+}
+
+.right {
+	text-align: right;
+}
+
+/*----------------------------------------------------------------------------*/
+/*                                   DIMENSION                                */
+/*----------------------------------------------------------------------------*/
+.height40 {
+	height: 40%;
+}
+
+.height100 {
+	height: 100%;
+}
+
+.height60px {
+	height: 60px;
+}
+
+.height100px {
+	height: 100px;
+}
+
+.height150 {
+	height: 150px;
+}
+
+.height200px {
+	height: 200px;
+}
+
+.height250px {
+	height: 250px;
+}
+
+.height255px {
+	height: 255px;
+}
+
+.height260px {
+	height: 260px;
+}
+
+.height275px {
+	height: 275px;
+}
+
+.height300px {
+	height: 300px;
+}
+
+.height500px {
+	height: 500px;
+}
+
+.height540px {
+	height: 540px;
+}
+
+.height600px {
+	height: 600px;
+}
+
+.width1 {
+	width: 1%;
+}
+
+.width2 {
+	width: 2%;
+}
+
+.width3 {
+	width: 3%;
+}
+
+.width5 {
+	width: 5%;
+}
+
+.width6 {
+	width: 6%;
+}
+
+.width7 {
+	width: 7%;
+}
+
+.width9 {
+	width: 9%;
+}
+
+.width10 {
+	width: 10%;
+}
+
+.width12 {
+	width: 12%;
+}
+
+.width13 {
+	width: 13%;
+}
+
+.width15 {
+	width: 15%;
+}
+
+.width20 {
+	width: 20%;
+}
+
+.width25 {
+	width: 25%;
+}
+
+.width28 {
+	width: 28%;
+}
+
+.width30 {
+	width: 30%;
+}
+
+.width35 {
+	width: 35%;
+}
+
+.width40 {
+	width: 40%;
+}
+
+.width45 {
+	width: 45%;
+}
+
+.width50 {
+	width: 50%;
+}
+
+.width55 {
+	width: 55%;
+}
+
+.width60 {
+	width: 60%;
+}
+
+.width65 {
+	width: 65%;
+}
+
+.width70 {
+	width: 70%;
+}
+
+.width75 {
+	width: 75%;
+}
+
+.width80 {
+	width: 80%;
+}
+
+.width85 {
+	width: 85%;
+}
+
+.width89 {
+	width: 89%;
+}
+
+.width90 {
+	width: 90%;
+}
+
+.width93 {
+	width: 93%;
+}
+
+.width95 {
+	width: 95%;
+}
+
+.width98 {
+	width: 98%;
+}
+
+.width99 {
+	width: 99%;
+}
+
+.width100 {
+	width: 100%;
+}
+
+/*----------------------------------------------------------------------------*/
+/*                                    ALIGN                                   */
+/*----------------------------------------------------------------------------*/
+.alignTop {
+	vertical-align: top;
+}
+
+.alignBottom {
+	vertical-align: bottom;
+}
+
+.alignMiddle {
+	vertical-align: middle;
+}
+
+.center {
+	text-align: center;
+}
+div.center div, div.center p, div.center table, div.center form {
+    text-align: left; margin-left: auto; margin-right: auto;
+}
+
+.left {
+	text-align: left;
+}
+
+.right {
+	text-align: right;
+}
+
+/*----------------------------------------------------------------------------*/
+/*                                   FORMULARIO                               */
+/*----------------------------------------------------------------------------*/
+.formPanel {
+	background-color: #ffffff;
+	margin-top: 10px;
+}
+
+.formLabel {
+	width: 200px;
+	font-weight: bold;
+	text-align: left;
+}
+
+.formField {
+	width: 300px;
+}
+
+/*----------------------------------------------------------------------------*/
+/*                                   FILE UPLOAD                              */
+/*----------------------------------------------------------------------------*/
+.panelFileUpload {
+	width: 250px;
+	height: 70px;
+}
+
+/*----------------------------------------------------------------------------*/
+/*                                   IMAGE                                    */
+/*----------------------------------------------------------------------------*/
+.noBorder {
+	border: 0px;
+}
+
+/*----------------------------------------------------------------------------*/
+/*                                   TAB                                      */
+/*----------------------------------------------------------------------------*/
+
+cursorPointer {
+	cursor:pointer;
+}
+
+
+/*----------------------------------------------------------------------------*/
+/*                              COMPONENT MESSAGE                             */
+/*----------------------------------------------------------------------------*/
+.info {
+	-moz-border-radius: 5px;
+	font-size: 13px;
+	font-weight: bold;
+	color: #003399 !important;
+	background-image: url(/bradesco-seguro-admin-web/javax.faces.resource/info.png?ln=imagens);
+	background-position: left center;
+	background-repeat: no-repeat;
+	background-color: #D2E4FF;
+	border: 1px dashed #003399;
+	padding-left: 26px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	margin-bottom: 4px;
+}
+
+.warn {
+	-moz-border-radius: 5px;
+	font-size: 13px;
+	font-weight: bold;
+	color: #F99404 !important;
+	background-image: url(/bradesco-seguro-admin-web/javax.faces.resource/warn.png?ln=imagens);
+	background-position: left center;
+	background-repeat: no-repeat;
+	background-color: #FFF5D2;
+	border: 1px dashed #F99404;
+	padding-left: 26px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	margin-bottom: 4px;
+}
+
+.error {
+	-moz-border-radius: 5px;
+	font-size: 13px;
+	font-weight: bold;
+	color: #FF0000 !important;
+	background-image: url(/bradesco-seguro-admin-web/javax.faces.resource/error.png?ln=imagens);
+	background-position: left center;
+	background-repeat: no-repeat;
+	background-color: #FFD5D2;
+	border: 1px dashed #FF0000;
+	padding-left: 26px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	margin-bottom: 4px;
+}
+
+.fatal {
+	-moz-border-radius: 5px;
+	font-size: 13px;
+	font-weight: bold;
+	color: #FF0000 !important;
+	background-image: url(/bradesco-seguro-admin-web/javax.faces.resource/error.png?ln=imagens);
+	background-position: left center;
+	background-repeat: no-repeat;
+	background-color: #FFD5D2;
+	border: 1px dashed #FF0000;
+	padding-left: 26px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	margin-bottom: 4px;
+}
+
+/******************************************************************************/
+/*              	           TOOLBAR   			              */
+/******************************************************************************/
+table .toolbarButton {
+	-moz-border-radius: 5px;
+	background-repeat: no-repeat !important;
+	background-position: left center !important;
+	border: 1px solid #FFFFFF !important;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 11px;
+	height: 23px !important;
+	padding-left: 20px;
+}
+
+table .toolbarButton:hover {
+	border-color: #BED6F8;
+	background-color: #C0C0C0;
+	cursor: pointer;
+}
+
+.btnConteudoApoio {
+        background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/apoio.png?ln=imagens') !important;
+}
+
+.btnEnviarEmail {
+    background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/send-mail.png?ln=imagens') !important;
+}
+
+.btnExecutar {
+        background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/apply.png?ln=imagens') !important;
+}
+
+.toolbarButtonExe {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/exe.png?ln=imagens') !important;
+}
+
+.toolbarButtonFind {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/find.png?ln=imagens') !important;
+}
+
+.toolbarButtonExportCsv {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/csv.png?ln=imagens') !important;
+}
+
+.toolbarButtonSave {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/save.png?ln=imagens') !important;
+}
+
+.toolbarButtonVoltar {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/iconUndo.png?ln=imagens') !important;
+}
+
+.toolbarButtonAtualizaLista {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/iconEdit.png?ln=imagens') !important;
+}
+
+.toolbarButtonAdd {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/add.png?ln=imagens') !important;
+}
+
+.toolbarButtonClose {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/close.png?ln=imagens') !important;
+}
+
+.buttonImgFinalizar {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/apply.png?ln=imagens') !important;
+}
+
+.toolbarButtonNew {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/new.png?ln=imagens') !important;
+}
+
+.toolbarButtonUnlock {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/lock_unlock.png?ln=imagens') !important;
+}
+
+.toolbarButtonFinalizarVenda {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/finalizarVenda.png?ln=imagens') !important;
+}
+
+.buttonImgPriority {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/priority.png?ln=imagens') !important;
+}
+
+.buttonImgAnnex {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/anexo.gif?ln=imagens') !important;
+}
+
+.buttonImgClear {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/clear.png?ln=imagens') !important;
+}
+
+.buttonImgDownload {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/download.png?ln=imagens') !important;
+}
+
+.iconQuestionario {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/questionario.png?ln=imagens') !important;
+}
+
+.iconVisible {
+	background-image: url('/bradesco-seguro-admin-web/javax.faces.resource/visible.png?ln=imagens') !important;
+}
+
+.linhaPar {
+	padding: 0; 
+	margin: 0;
+}
+
+.linhaImpar {
+	background-color: #EEE9E9;
+	padding: 0; 
+	margin: 0;
+}
+
+.linhaPar:hover {
+	background-color: #D9D9D9;
+	padding: 0; 
+	margin: 0;
+}
+.linhaImpar:hover {
+	background-color: #D9D9D9;
+	padding: 0; 
+	margin: 0;
+}
+
+/* COLUNA SALVAR */
+.col1_barra {
+	width: 50%;
+	text-align: left;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.col2_barra {
+	width: 50%;
+	text-align: right;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+/* GRID 4 COLUNAS*/
+.col1_grid {
+        width: 35%;
+	text-align: left;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.col2_grid {
+        width: 15%;
+	text-align: right;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+/* COLUNA TELA */
+.col1_tela {
+	width: 15%;
+	text-align: left;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.col4_tela {
+	width: 35%;
+	text-align: left;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.col3_tela {
+	width: 70%;
+	text-align: left;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+
+.col2_tela {
+	width: 85%;
+	text-align: left;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.col5_tela {
+	width: 6%;
+	text-align: left;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.col1_tela_linha {
+	width: 10%;
+	text-align: left;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+/* COLUNA SALVAR */
+.col1_barra_logo {
+	width: 20%;
+	text-align: left;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.col2_barra_logo {
+	width: 80%;
+	text-align: left;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 15px;
+	font-weight: bold;
+}
+
+.col5_barra_logo {
+	width: 5%;
+	text-align: left;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.col95_barra_logo {
+	width: 95%;
+	text-align: left;
+	font-family: Arial, Verdana, sans-serif !important;
+	font-size: 15px;
+	font-weight: bold;
+}
+textarea, input[type="text"], input[type="password"], select {
+    background-image: none;
+}

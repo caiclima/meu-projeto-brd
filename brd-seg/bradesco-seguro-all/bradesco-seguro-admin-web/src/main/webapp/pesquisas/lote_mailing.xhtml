@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich"
+	template="/WEB-INF/templates/template.xhtml"
+	xmlns:cts="http://br.com.callink/components/customs">
+
+	<ui:define name="head">
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>#{bundle.LBL_lote_mailing}</title>
+	</ui:define>
+
+	<ui:define name="body">
+	<h:outputScript library="js" name="Mascara.js"></h:outputScript>
+	<h:panelGrid styleClass="width100">
+
+		<h:form id="formLoteMailing">
+
+			<rich:panel id="panelListagemCampanhas"
+				header="#{bundle.LBL_pesquisa_lote_mailing}"
+				styleClass="height100">
+
+				<rich:messages id="messages" errorClass="error" fatalClass="fatal"
+					infoClass="info" warnClass="warn" />
+
+				<rich:toolbar height="30px">
+					<a4j:commandButton value="#{bundle.LBL_novo}"
+						action="#{loteMailingBB.novoRegistro()}"
+						styleClass="toolbarButton toolbarButtonNew" execute="@form"
+						render="gridFiltros"/>
+
+					<a4j:commandButton value="#{bundle.LBL_pesquisar}"
+						action="#{loteMailingBB.pesquisar()}" execute="@form" render="dataTableLoteMailing"
+						styleClass="toolbarButton toolbarButtonFind" />
+				</rich:toolbar>
+				<div style="height: 5px;" />
+				
+					<!-- Grid com os 1°s campos -->
+					<h:panelGrid id="gridFiltros" columns="2" columnClasses="col1_tela, col2_tela" styleClass="width70" >
+						
+						<h:outputText value="#{bundle.LBL_id_lote_mailing}:" />
+						<h:inputText value="#{loteMailingBB.loteMailing.id}" maxlength="10" converter="StringConverter" styleClass="width30" onkeypress="return soNumeros(event);" />
+						
+						<h:outputText value="#{bundle.LBL_campanha}:" />
+						<h:panelGrid columns="3" style="margin-left:-4px;"  styleClass="width40">
+							<h:inputText id="inputTextCampanha"
+								value="#{loteMailingBB.loteMailing.campanha.nomeCampanha}" styleClass="width95" readonly="true"  maxlength="100" />
+								
+							<a4j:commandLink id="pesquisaCampanha"
+											execute="@this" render="panelPesquisacampanha"
+											oncomplete="#{rich:component('modalPesquisaCampanha')}.show(); return false;">
+											
+								<h:graphicImage library="imagens" name="find.png" alt="#{bundle.LBL_pesquisar_atendente}"
+									title="#{bundle.LBL_pesquisar_atendente}" styleClass="button" />
+							</a4j:commandLink>
+							<a4j:commandLink action="#{loteMailingBB.limpaCamapanha()}" id="limpa_atendente"
+											execute="@this" render="inputTextCampanha">
+											
+								<h:graphicImage library="imagens" name="clear.png" alt="#{bundle.LBL_limpar_atendente}"
+									title="#{bundle.LBL_limpar_atendente}" styleClass="button" />
+							</a4j:commandLink>
+						</h:panelGrid>
+						
+						
+						<h:outputText value="#{bundle.LBL_designacao}:" />
+						<h:inputText value="#{loteMailingBB.loteMailing.designacao}" maxlength="100" converter="StringConverter" styleClass="width30" />
+						
+						<h:outputText value="#{bundle.LBL_quantidade_importada}:" />
+						<h:inputText value="#{loteMailingBB.loteMailing.quantidadeImportada}" maxlength="15" converter="StringConverter" styleClass="width30" onkeypress="return soNumeros(event);"/>
+						
+						<h:outputText value="#{bundle.LBL_quantidade_rejeitada}:" />
+						<h:inputText value="#{loteMailingBB.loteMailing.quantidadeRejeitada}" maxlength="15" converter="StringConverter" styleClass="width30" onkeypress="return soNumeros(event);" />
+						
+						<h:outputText value="#{bundle.LBL_data_importacao}:" />
+						<h:panelGrid columns="3" style="margin-left:-4px;"  styleClass="width40">
+		                    <rich:calendar value="#{loteMailingBB.loteMailing.dataImportacao}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width40"/>
+							
+							<h:outputText value="#{bundle.LBL_ate}:" />
+		                    <rich:calendar value="#{loteMailingBB.ateDataImportacao}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width100"/>
+	                    </h:panelGrid>
+
+						<h:outputText value="#{bundle.LBL_data_inicio_mailing}:" />
+						<h:panelGrid columns="3" style="margin-left:-4px;"  styleClass="width40">
+		                    <rich:calendar value="#{loteMailingBB.loteMailing.dataInicioMailing}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width40"/>
+							
+							<h:outputText value="#{bundle.LBL_ate}:" />
+		                    <rich:calendar value="#{loteMailingBB.ateDataInicioMailing}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width100"/>
+	                    </h:panelGrid>
+	                    
+						<h:outputText value="#{bundle.LBL_data_fim_mailing}:" />
+						<h:panelGrid columns="3" style="margin-left:-4px;"  styleClass="width40">
+		                    <rich:calendar value="#{loteMailingBB.loteMailing.dataFimMailing}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width40"/>
+							
+							<h:outputText value="#{bundle.LBL_ate}:" />
+		                    <rich:calendar value="#{loteMailingBB.ateDataFimMailing}" datePattern="dd/MM/yyyy" inputSize="16" showApplyButton="false" styleClass="width100"/>
+	                    </h:panelGrid>
+					</h:panelGrid>
+				
+				<div style="height: 5px;" />
+
+				<h:panelGrid styleClass="width100">
+					<rich:dataTable
+						columnClasses="width7, width10, width15, width8, width8, width10, width10, width10, width10, width15, width10"
+						id="dataTableLoteMailing" styleClass="width100"
+						iterationStatusVar="it" rows="10" value="#{loteMailingBB.listPojos}" var="mailing">
+
+						<rich:column styleClass="right">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_id_lote_mailing}" />
+							</f:facet>
+							<h:outputText value="#{mailing.id}" />
+						</rich:column>
+
+						<rich:column styleClass="center" sortBy="#{mailing.campanha.nomeCampanha}"
+							sortOrder="#{loteMailingBB.getSortOrder('CAMPANHA')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_campanha}"
+									render="dataTableLoteMailing statusRequest"
+									action="#{loteMailingBB.sortBy('CAMPANHA')}" />
+							</f:facet>
+							<h:outputText value="#{mailing.campanha.nomeCampanha}"/>
+						</rich:column>
+
+						<rich:column styleClass="center" sortBy="#{mailing.designacao}"
+							sortOrder="#{loteMailingBB.getSortOrder('DESIGNACAO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_designacao}"
+									render="dataTableLoteMailing statusRequest"
+									action="#{loteMailingBB.sortBy('DESIGNACAO')}" />
+							</f:facet>
+						
+							<h:outputText value="#{mailing.designacao}"/>
+						</rich:column>
+
+						<rich:column styleClass="center" sortBy="#{mailing.quantidadeImportada}"
+							sortOrder="#{loteMailingBB.getSortOrder('QUANTIDADE_IMPORTACAO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_quantidade_importada}"
+									render="dataTableLoteMailing statusRequest"
+									action="#{loteMailingBB.sortBy('QUANTIDADE_IMPORTACAO')}" />
+							</f:facet>
+							
+							<h:outputText value="#{mailing.quantidadeImportada}"/>
+						</rich:column>
+						
+						<rich:column styleClass="center" sortBy="#{mailing.quantidadeRejeitada}"
+							sortOrder="#{loteMailingBB.getSortOrder('QUANTIDADE_REJEITADA')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_quantidade_rejeitada}"
+									render="dataTableLoteMailing statusRequest"
+									action="#{loteMailingBB.sortBy('QUANTIDADE_REJEITADA')}" />
+							</f:facet>
+							
+							<h:outputText value="#{mailing.quantidadeRejeitada}" />
+						</rich:column>
+						
+						<rich:column styleClass="center" sortBy="#{mailing.dataImportacao}"
+							sortOrder="#{loteMailingBB.getSortOrder('DATA_IMPORTACAO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_data_importacao}"
+									render="dataTableLoteMailing statusRequest"
+									action="#{loteMailingBB.sortBy('DATA_IMPORTACAO')}" />
+							</f:facet>
+							
+							<h:outputText value="#{mailing.dataImportacao}" converter="DateConverter"/>
+						</rich:column>
+						
+						<rich:column styleClass="center" sortBy="#{mailing.dataInicioMailing}"
+							sortOrder="#{loteMailingBB.getSortOrder('DATA_INICIO_MAILING')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_data_inicio_mailing}"
+									render="dataTableLoteMailing statusRequest"
+									action="#{loteMailingBB.sortBy('DATA_INICIO_MAILING')}" />
+							</f:facet>
+							
+							<h:outputText value="#{mailing.dataInicioMailing}" converter="DateConverter" />
+						</rich:column>
+						
+						<rich:column styleClass="center" sortBy="#{mailing.dataFimMailing}"
+							sortOrder="#{loteMailingBB.getSortOrder('DATA_FIM_MAILING')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_data_fim_mailing}"
+									render="dataTableLoteMailing statusRequest"
+									action="#{loteMailingBB.sortBy('DATA_FIM_MAILING')}" />
+							</f:facet>
+							
+							<h:outputText value="#{mailing.dataFimMailing}" converter="DateConverter"/>
+						</rich:column>
+						
+						<rich:column styleClass="center width10" sortBy="#{mailing.logDate}"
+							sortOrder="#{loteMailingBB.getSortOrder('DATA_ULTIMA_ALTERACAO')}" >
+                        <f:facet name="header">
+                            <a4j:commandLink value="#{bundle.LBL_ultima_alteracao}"
+									render="dataTableLoteMailing statusRequest"
+									action="#{loteMailingBB.sortBy('DATA_ULTIMA_ALTERACAO')}" />
+                        </f:facet>
+                        <h:outputText value="#{mailing.logDate}" converter="DateConverter" />
+                    </rich:column>
+                    
+                    <rich:column styleClass="center width10" sortBy="#{mailing.logUid}"
+							sortOrder="#{loteMailingBB.getSortOrder('ALTERADO_POR')}">
+                        <f:facet name="header">
+                            <a4j:commandLink value="#{bundle.LBL_alterado_por}"
+									render="dataTableLoteMailing statusRequest"
+									action="#{loteMailingBB.sortBy('ALTERADO_POR')}" />
+                        </f:facet>
+                        <h:outputText value="#{mailing.logUid}" />
+                    </rich:column>
+						
+						<rich:column styleClass="center" sortBy="#{mailing.logHost}"
+							sortOrder="#{loteMailingBB.getSortOrder('HOST')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.LBL_log_host}"
+									render="dataTableLoteMailing statusRequest"
+									action="#{loteMailingBB.sortBy('HOST')}" />
+							</f:facet>
+							
+							<h:outputText value="#{mailing.logHost}"/>
+						</rich:column>
+
+						<rich:column styleClass="center">
+							<f:facet name="header">
+								<h:outputText value="#{bundle.LBL_finalizar_mailing}" />
+							</f:facet>
+							 <a4j:commandLink action="#{loteMailingBB.confirmarFinalizacaoLoteMailing(mailing)}"
+								execute="@this"
+								oncomplete="#{rich:component('modalConfirmaFinalizacao')}.show(); return false;">
+
+								<h:graphicImage library="imagens" name="cancel.png"
+									alt="#{bundle.LBL_finalizar_mailing}"
+									title="#{bundle.LBL_finalizar_mailing}" styleClass="button" />
+							</a4j:commandLink> 
+						</rich:column>
+
+
+						<f:facet name="footer">
+                        	<rich:dataScroller />
+                    	</f:facet>
+					</rich:dataTable>
+				</h:panelGrid>
+			</rich:panel>
+		</h:form>
+		</h:panelGrid>
+	
+	<!-- modal de confirmação de finalização de loteMailing -->
+		<h:form>
+            <rich:popupPanel id="modalConfirmaFinalizacao" modal="true"
+                             domElementAttachment="form" resizeable="false" height="100"
+                             width="250">
+                <f:facet name="header">
+                    <h:panelGrid columns="3" styleClass="table width100"
+                                 columnClasses="col1_barra, col2_barra, col2_barra">
+                                 
+                        <h:outputText value="#{bundle.LBL_confirma_finalizacao}" />
+                        
+                    </h:panelGrid>
+                </f:facet>
+                <h:panelGrid columns="2" styleClass="width100"
+                             columnClasses="width50, width50">
+                             
+                       <a4j:commandButton value="#{bundle.LBL_confirmacao}" action="#{loteMailingBB.finalizar()}"
+                                          oncomplete="#{rich:component('modalConfirmaFinalizacao')}.hide()"
+                                          styleClass="width90 toolbarButton buttonImgFinalizar" execute="@form"
+                                          render="panelListFeriado, dataTableLoteMailing" />
+                       
+					
+                       <a4j:commandButton action="#{loteMailingBB.novoRegistro()}"
+                                           value="#{bundle.LBL_negacao}" execute="@this" styleClass="width90 toolbarButton toolbarButtonClose"
+                                           oncomplete="#{rich:component('modalConfirmaFinalizacao')}.hide()" />
+
+
+                </h:panelGrid>
+            </rich:popupPanel>
+        </h:form>
+        <!-- popUp para efetuar a pesquisa do campanha -->
+        <h:form>
+		<rich:popupPanel id="modalPesquisaCampanha"
+			width="420" height="295" modal="true" 
+			domElementAttachment="form" resizeable="true">
+
+			<f:facet name="header">
+			<h:panelGrid columns="2" styleClass="table width100"
+                             columnClasses="col1_barra, col2_barra, col2_barra">
+                             
+	            	<h:outputText value="#{bundle.LBL_pesquisar_campanha}" />
+		            
+		            <a4j:commandButton execute="@this" styleClass="toolbarButton toolbarButtonClose"
+	                                   oncomplete="#{rich:component('modalPesquisaCampanha')}.hide(); return false;" value="#{bundle.LBL_fechar}" />
+		       </h:panelGrid>
+	        </f:facet>
+	        
+			<rich:messages id="messages" errorClass="error" fatalClass="fatal" infoClass="info" warnClass="warn" /> 
+
+			<h:panelGrid id="panelPesquisacampanha" styleClass="width98">
+			
+				<h:panelGrid id="panelmodalPesquisaCampanha" columns="3" columnClasses="width5, width70, width	" styleClass="center width100">
+                    <h:outputText value="#{bundle.LBL_campanha}: "/>
+                    <h:inputText value="#{loteMailingBB.nomeCampanha}" size="25" maxlength="50" styleClass="width100" />
+                    <a4j:commandLink id="lkFiltrarUsuario"
+                                     actionListener="#{loteMailingBB.pesquisaCampanha()}"
+                                     title="#{bundle.LBL_filtrar_campanha}"
+                                     execute="@form"
+                                     render="dataTablePesquisaCampanha, scrollPesquisaCampanha"  styleClass="width30">
+                        <h:graphicImage styleClass="toolBarButton" library="imagens" name="find.png"/>
+                    </a4j:commandLink>
+                </h:panelGrid>
+                <rich:dataTable id="dataTablePesquisaCampanha"
+                                value="#{loteMailingBB.listCampanhas}"
+                                var="pesquisaCampanha"
+                                styleClass="width100"
+                                cellspacing="0"
+                                columnsWidth="55%,35%,10%"
+                                onRowMouseOver="this.style.backgroundColor='#E7E7E7';"
+                                onRowMouseOut="this.style.backgroundColor='#FFFFFF'"
+                                rows="5">
+
+                    <rich:column sortBy="#{pesquisaCampanha.nomeCampanha}"
+							sortOrder="#{loteMailingBB.getSortOrder('NOME')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.Nome}"
+									render="dataTablePesquisaCampanha statusRequest"
+									action="#{loteMailingBB.sortBy('NOME')}" />
+							</f:facet>
+                        <h:outputText value="#{pesquisaCampanha.nomeCampanha}"/>
+                    </rich:column>
+                    <rich:column sortBy="#{pesquisaCampanha.flagEnabled}"
+                    		sortOrder="#{loteMailingBB.getSortOrder('ATIVO')}">
+							<f:facet name="header">
+								<a4j:commandLink value="#{bundle.Ativo}"
+									render="dataTablePesquisaCampanha statusRequest"
+									action="#{loteMailingBB.sortBy('ATIVO')}" />
+							</f:facet>
+                        <h:outputText value="#{pesquisaCampanha.flagEnabled}"/>
+                    </rich:column>
+
+                    <rich:column styleClass="center">
+                        <a4j:commandLink 
+                        	id="lkSelecionaCampanha" 
+                        	action="#{loteMailingBB.selecionarCampanha(pesquisaCampanha)}" 
+                        	render="inputTextCampanha" execute="@form"
+                        	oncomplete="#{rich:component('modalPesquisaCampanha')}.hide(); return false;">
+                            <h:graphicImage library="imagens" name="apply.png" alt="#{bundle.LBL_selecionar_campanha}"
+										title="#{bundle.LBL_selecionar_campanha}" styleClass="button" />
+                        </a4j:commandLink>
+                    </rich:column>
+
+                    <f:facet name="footer">
+                        <rich:columnGroup style="background-color:transparent;">
+                            <rich:column colspan="4">
+                                <rich:dataScroller id="scrollPesquisaCampanha"/>
+                            </rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
+
+                </rich:dataTable>
+			</h:panelGrid>
+		</rich:popupPanel>
+		</h:form>
+	</ui:define>
+</ui:composition>

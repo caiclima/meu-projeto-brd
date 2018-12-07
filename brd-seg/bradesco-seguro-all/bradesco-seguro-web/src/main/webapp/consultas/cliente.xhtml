@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:rich="http://richfaces.org/rich">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<h:outputStylesheet library="css" name="styleSheet.css" />
+	 <h:outputScript library="js" target="head" name="script.js"/>
+	<!-- <script>
+		function openCUCForPesquisa(urlCUC,CNPJ) {
+			urlCUC = urlCUC.replace("#CPFCNPJ#",CNPJ);
+			alert(urlCUC);
+			//window.open(urlCUC, '_winCUC', 'scrollbars=1,resizable=1,status=no,toolbar=no,menubar=1,location=no,directories=no,copyhistory=no');
+		}
+	</script>-->
+</h:head>
+<h:body styleClass="lineHeight">
+
+	<!-- form -->
+	<h:form>
+		<f:metadata>
+		    <f:viewParam id="callURL" name="callURL" value="#{consultaClienteCampanhaBB.callURL}"/>
+		    <f:viewParam id="UserID" name="UserID" value="#{consultaClienteCampanhaBB.userID}"/>
+		</f:metadata>
+	
+		<p><rich:messages styleClass="messages"/></p>
+			
+		<rich:panel styleClass="formPanel">
+			<h:panelGrid columns="2" styleClass="panelGrid" columnClasses="left">
+				<h:outputText styleClass="formLabel" value="#{bundle.Nome}:" />
+				<h:inputText styleClass="formField"
+					value="#{consultaClienteCampanhaBB.nome}" maxlength="255" />
+
+				<h:outputText styleClass="formLabel" value="#{bundle.CNPJ}:" />
+				<h:inputText styleClass="formField"
+					value="#{consultaClienteCampanhaBB.cnpj}" maxlength="255" />
+			</h:panelGrid>
+		</rich:panel>
+
+		<!-- crud operations -->
+		<rich:toolbar styleClass="width100 center">
+			<h:panelGrid columns="4">
+				<a4j:commandButton value="#{bundle.Pesquisar}"
+					onclick="$(this).attr('disabled','disabled');"
+					oncomplete="$(this).removeAttr('disabled');"
+					action="#{consultaClienteCampanhaBB.pesquisar}"
+					title="#{bundle.Hint_Pesquisar}" execute="@form" render="@form" />
+				<a4j:commandButton value="#{bundle.Limpar}"
+					action="#{consultaClienteCampanhaBB.limpar}" execute="@form"
+					render="@form" />
+			</h:panelGrid>
+		</rich:toolbar>
+
+		<p></p>
+
+		<!-- data -->
+		<rich:dataTable id="mainDataTable"
+			value="#{consultaClienteCampanhaBB.dados}" var="current"
+			noDataLabel="#{bundle.Nenhum_Registro}" rows="15"
+			rowClasses="rowOdd, rowEven" styleClass="gridCrud" style="width:100%"
+			rendered="#{! empty consultaClienteCampanhaBB.dados}">
+
+			<!-- custom columns -->
+			<rich:column styleClass="center" style="width:10%">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.Id_Cliente_Campanha}" />
+				</f:facet>
+				<h:outputText value="#{current.idClienteCampanha}" />
+			</rich:column>
+
+			<rich:column styleClass="left" style="width:35%">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.Nome}" />
+				</f:facet>
+				<h:outputText value="#{current.nome}" />
+			</rich:column>
+
+
+			<rich:column styleClass="center" style="width:20%">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.CNPJ}" />
+				</f:facet>
+				<h:outputText value="#{current.cnpj}" />
+			</rich:column>
+
+			<rich:column styleClass="left" style="width:10%">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.label_ddd}" />
+				</f:facet>
+				<h:outputText value="#{current.ddd}" />
+			</rich:column>
+			
+			<rich:column styleClass="left" style="width:30%">
+				<f:facet name="header">
+					<h:outputText value="#{bundle.Telefone}" />
+				</f:facet>
+				<h:outputText value="#{current.telefone}" />
+			</rich:column>
+			<!-- action columns -->
+			<rich:column styleClass="center gridActionColumn">
+				<f:facet name="header">
+					<h:outputText styleClass="gridActionLabel" value="#{bundle.label_Acoes}" />
+				</f:facet>
+				<h:panelGrid columns="3">
+					<a4j:commandLink  action="#{consultaClienteCampanhaBB.atualizaCliente}" 
+							execute="@this" render="mainDataTable"
+							oncomplete="#{consultaClienteCampanhaBB.pesquisar()}">
+		              		<h:graphicImage id="propostaCliente" library="images" width="16px" height="16px" styleClass="button" alt="#{bundle.label_atualizarCliente}" title="#{bundle.label_atualizarCliente}" name="atualizar-16.png" />
+		              		<f:setPropertyActionListener value="#{current.cnpj}"  target="#{consultaClienteCampanhaBB.cnpjAtualizacao}" />   
+		              		<f:setPropertyActionListener value="#{current.idClienteCampanha}"  target="#{consultaClienteCampanhaBB.idClienteCampanha}" />
+	              	</a4j:commandLink>
+					<h:graphicImage id="cucCliente" onclick="javascript:openCUCForPesquisa('#{consultaClienteCampanhaBB.getUrlCuc()}','#{current.cnpj}');" library="images"  alt="#{bundle.label_MostrarCuc}" title="#{bundle.label_MostrarCuc}" width="16px" height="16px" styleClass="button" name="iconPedenciasAtendimento.png"  />
+					<h:outputLink value="#{consultaClienteCampanhaBB.callURL}#{consultaClienteCampanhaBB.urlAspect}idClienteCampanha=#{current.idClienteCampanha}&amp;telefone=#{current.ddd}#{current.telefone}&amp;servico=#{consultaClienteCampanhaBB.idServicoAspect}&amp;cnpj=#{current.cnpj}">#{bundle.Discar}</h:outputLink>
+				</h:panelGrid>
+			</rich:column>
+
+			<!-- footer -->
+			<f:facet name="footer">
+				<rich:dataScroller renderIfSinglePage="false" />
+			</f:facet>
+		</rich:dataTable>
+	</h:form>
+</h:body>
+</html>

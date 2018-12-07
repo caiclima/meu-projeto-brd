@@ -1,0 +1,906 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<sql-query name="LoteMailing.insertNuvemVendaArquivoRetorno">
+		<![CDATA[
+			    INSERT INTO TB_NUVEM_VENDAS_ARQUIVO_RETORNO (CARTAO ,NOME ,ENDERECO , BAIRRO ,CIDADE ,UF ,CEP ,FONE_COMERCIAL ,FONE_RESIDENCIAL ,FONE_CELULAR ,SEXO ,CPF ,DIA_VENCECIMENTO_FATURA ,DATA_NASCIMENTO ,PRODUTO ,VALIDADE_CARTAO ,RG ,ORGAO_EXPEDIDOR ,DATA_EXPEDICAO ,ESTADO_CIVIL , PROFISSAO ,ESPORTE ,EMAIL ,OPTIN_EMAIL ,OPTIN_FONECOM ,OPTIN_FONERES ,OPTIN_FONEADD ,PRODUTO_FRONT , PLANO, VALOR, POSSUI_DEPENDENTES ,RESULTADO_CONTATO )
+			SELECT 
+					contatoMailing.CARTAO as CARTAO,
+					beneficiario.NOME as NOME,
+					contatoMailing.ENDERECO as ENDERECO,
+					contatoMailing.BAIRRO as BAIRRO,
+					contatoMailing.CIDADE as CIDADE,
+					contatoMailing.UF as UF,
+					contatoMailing.CEP as CEP,
+					contatoMailing.FONE_COMERCIAL as FONECOM,
+					contatoMailing.FONE_RESIDENCIAL as FONERES,
+					contatoMailing.FONE_CELULAR as FONEADD,
+					beneficiario.SEXO as SEXO,
+					beneficiario.CPF as CPF,
+					contatoMailing.DIA_VENCECIMENTO_FATURA as DIA_VENC_FATURA,
+					contatoMailing.DATA_NASCIMENTO as DT_NASCTO,
+					contatoMailing.PRODUTO as PRODUTO,
+					contatoMailing.VALIDADE_CARTAO as VALIDADE_CARTAO,
+					beneficiario.RG as RG,
+					beneficiario.ORGAO_EXPEDIDOR as RG_ORG_EXED,
+					beneficiario.DATA_EXPEDICAO as RG_DT_EXPED,
+					estadoCivil.CODIGO as ESTADO_CIVIL,
+					profissao.CODIGO_EXTERNO as PROFISSAO,
+					esporte.CODIGO_EXTERNO as ESPORTE,
+					contatoMailing.EMAIL as END_EMAIL,
+					case when contatoMailing.FLAG_RECEBE_OFERTAS_EMAIL   = 1 then 'S' ELSE 'N' END as OPTIN_EMAIL,
+					case when contatoMailing.FLAG_RECEBE_OFERTAS_SMS_COM = 1 then 'S' ELSE 'N' END as OPTIN_FONECOM,
+					case when contatoMailing.FLAG_RECEBE_OFERTAS_SMS_RES = 1 then 'S' ELSE 'N' END as OPTIN_FONERES,
+					case when contatoMailing.FLAG_RECEBE_OFERTAS_SMS_CEL = 1 then 'S' ELSE 'N' END as OPTIN_FONEADD,
+					produto.CODIGO as PRODUTO,
+					plano.CODIGO as PLANO,
+					venda.VALOR_TOTAL as VALOR,
+					CASE WHEN grauParentesco.CODIGO_EXTERNO = '01'
+							THEN 
+								CASE WHEN (SELECT COUNT(1) FROM TB_BENEFICIARIO as dependentes INNER JOIN TB_VENDA as vendaDependentes ON dependentes.ID_VENDA = vendaDependentes.ID_VENDA WHERE vendaDependentes.ID_VENDA = venda.ID_VENDA) > 1 
+									THEN 'S'
+									ELSE 'N'
+								END
+						ELSE 'N'
+
+					END as POSSUI_DEPENDENTES,
+					evento.NOME_EVENTO as RESULTADO_CONTATO
+					
+			FROM
+					TB_BENEFICIARIO as beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO as beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 				= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO as plano 									on beneficiarioPlano.ID_PLANO 					= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO as produto 								on plano.ID_PRODUTO 							= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA as venda 									on beneficiario.ID_VENDA 						= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA as cliente 						on venda.ID_CLIENTE_CAMPANHA 					= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING as contatoMailing 				on cliente.ID_CONTATO_MAILING 					= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING as loteMailing 						on contatoMailing.ID_LOTE_MAILING 				= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA as campanha 							on loteMailing.ID_CAMPANHA 						= campanha.ID_CAMPANHA
+INNER JOIN			TB_GRAU_PARENTESCO as grauParentesco				on beneficiario.ID_GRAU_PARENTESCO				= grauParentesco.ID_GRAU_PARENTESCO
+INNER JOIN 			TB_EVENTO as evento									on venda.ID_EVENTO								= evento.ID_EVENTO
+LEFT JOIN				TB_ESTADO_CIVIL as estadoCivil					on venda.ID_ESTADO_CIVIL						= estadoCivil.ID_ESTADO_CIVIL
+LEFT JOIN				TB_PROFISSAO as profissao						on venda.ID_PROFISSAO							= profissao.ID_PROFISSAO
+LEFT JOIN				TB_ESPORTE as esporte							on venda.ID_ESPORTE								= esporte.ID_ESPORTE
+			WHERE
+					venda.DATA_ENVIO IS NULL
+				AND   
+					venda.DATA_VENDA <= :dataEnvio
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+				AND 
+				(
+					( plano.ID_TIPO_PLANO = 2
+						AND 
+						  ( select planoTitular.ID_TIPO_PLANO 
+						    from tb_beneficiario AS beneficiarioTitular 
+						    INNER JOIN			TB_BENEFICIARIO_PLANO as titularPlano  		on beneficiarioTitular.ID_BENEFICIARIO 		= titularPlano.ID_BENEFICIARIO
+						    INNER JOIN			TB_PLANO as planoTitular 							on titularPlano.ID_PLANO 					= planoTitular.ID_PLANO
+						    INNER JOIN	TB_GRAU_PARENTESCO as parentescoTitular	on beneficiarioTitular.ID_GRAU_PARENTESCO = parentescoTitular.ID_GRAU_PARENTESCO
+						    WHERE beneficiarioTitular.ID_VENDA = venda.ID_VENDA 
+						    and parentescoTitular.CODIGO_EXTERNO = '01'
+						    ) = 2 
+					)
+					OR
+					grauParentesco.CODIGO_EXTERNO = '01' 
+				)
+        ]]>
+	</sql-query>
+	
+	
+	<sql-query name="LoteMailing.insertNuvemVendaCobrancaSeguradosPPlus">
+		<![CDATA[
+			        INSERT INTO TB_NUVEM_VENDAS_REGISTRO_COBRANCA_SEGURADOS_PPLUS (TIPO_REGISTRO, LOTE_TRANSACAO, TRANSACAO,CHAVE_SEGURADO,NUMERO_MEIO_COBRANCA,NUMERO_ADM_COBRANCA,NUMERO_CICLO_ADM_COBRANCA,NUMERO_CARTAO_CREDITO,DATA_ANUIDADE_CARTAO_CREDITO,NUMERO_CONTA_CARTAO_CREDITO,NUMERO_BANCO ,NUMERO_AGENCIA ,NUMERO_CONTA ,NUMERO_FUNCIONARIO,NOME_FUNCIONARIO,NUMERO_TIPO_MEIO_COBRANCA,CAMPO_RESERVADO_MEIO_COBRANCA,FILLER,ID_HEADER)
+			SELECT 
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroRegistro), '05') as TIPO_REGISTRO,
+					venda.ID_VENDA as LOTE_TRANSACAO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroTransacao), 'I ') as TRANSACAO,
+					beneficiario.CPF as CHAVE_SEGURADO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :meioCobranca), '2') as NUMERO_MEIO_COBRANCA,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :adminCobranca), '97') as NUMERO_ADM_COBRANCA,
+					contatoMailing.DIA_VENCECIMENTO_FATURA as NUMERO_CICLO_ADM_COBRANCA,
+					contatoMailing.CARTAO as NUMERO_CARTAO_CREDITO,
+					'' as DATA_ANUIDADE_CARTAO_CREDITO,
+					'' as NUMERO_CONTA_CARTAO_CREDITO,
+					'' as NUMERO_BANCO,
+					'' as NUMERO_AGENCIA,
+					'' as NUMERO_CONTA,
+					'' as NUMERO_FUNCIONARIO,
+					'' as NOME_FUNCIONARIO,
+					'' as NUMERO_TIPO_MEIO_COBRANCA,
+					'' as CAMPO_RESERVADO_MEIO_COBRANCA,
+					'' as FILLER,
+					:idHeader as ID_HEADER
+			FROM
+					TB_NUVEM_VENDAS_REGISTRO_HEADER_PPLUS as header, TB_BENEFICIARIO as beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO as beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 		= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO as plano 									on beneficiarioPlano.ID_PLANO 			= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO as produto 								on plano.ID_PRODUTO 					= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA as venda 									on beneficiario.ID_VENDA 				= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA as cliente 						on venda.ID_CLIENTE_CAMPANHA 			= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING as contatoMailing 				on cliente.ID_CONTATO_MAILING 			= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING as loteMailing 						on contatoMailing.ID_LOTE_MAILING 		= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA as campanha 							on loteMailing.ID_CAMPANHA 				= campanha.ID_CAMPANHA
+INNER JOIN 			TB_EVENTO as evento									on venda.ID_EVENTO					= evento.ID_EVENTO
+INNER JOIN			TB_GRAU_PARENTESCO as grauParentesco				on beneficiario.ID_GRAU_PARENTESCO		= grauParentesco.ID_GRAU_PARENTESCO
+			WHERE
+					venda.DATA_ENVIO IS NULL
+				AND   
+					venda.DATA_VENDA <= :dataEnvio
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND
+					produto.VALIDACAO_VENDA_PRODUTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoProduto)
+				AND
+					grauParentesco.CODIGO_EXTERNO = '01'
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+        ]]>
+	</sql-query>
+	
+	
+	<sql-query name="LoteMailing.insertNuvemVendaCadastroSeguradosPPlus">
+		<![CDATA[
+		
+		INSERT INTO TB_NUVEM_VENDAS_REGISTRO_CADASTRO_SEGURADOS_PPLUS (TIPO_REGISTRO,	LOTE_TRANSACAO,	TRANSACAO,	CHAVE_SEGURADO,	NOME_SEGURADO,	EMAIL,	RG_SEGURADO,	ORGAO_EMISSOR,	DATA_EMISSAO,	CPF_SEGURADO,	SEXO_SEGURADO,	DATA_NASC_SEGURADO,	NUMERO_ESTADO_CIVIL,	ENDERECO_SEGURADO,	COMPLEMENTO,	BAIRRO_SEGURADO,	NUM_ENDERECO_SEGURADO,	CIDADE_SEGURADO,	ESTADO_SEGURADO,	CEP_SEGURADO,	PROFISSAO_SEGURADO,	DDD_TELEFONE_RES,	NUM_TELEFONE_RES,	RAMAL_TELEFONE_RES,	DDD_TELEFONE_COM,	NUM_TELEFONE_COM,	RAMAL_TELEFONE_COM,	DDD_TELEFONE_FAX_CELULAR,	NUM_TELEFONE_FAX_CELULAR,	RAMAL_TELEFONE_FAX_CELULAR,	TIPO_SEGURADO,	PREMIOS_SEGURADOS,	PLANO,	INICIO_VIGENCIA_SEGURADO,	CAMPO_LIVRE_1,	CAMPO_LIVRE_2,	CAMPO_LIVRE_3,	CAMPO_LIVRE_4,	CAMPO_LIVRE,	NUMERO_SEQUENCIAL_SEGURADO,	NUMERO_UNICO_SEGURADO_SITE,	OPCAO_RECEBER_EMAIL_CERTIFICADO,	DATA_OPCAO_RECEBIMENTO_EMAIL,	PERMITE_RECEBIMENTO_EMAIL_MARKETING,	DATA_OPCAO_RECEBIMENTO_EMAIL_MARKETING,	FILLER, ID_HEADER)
+			SELECT 
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroRegistro), '05') as TIPO_REGISTRO,
+					venda.ID_VENDA as LOTE_TRANSACAO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroTransacao), 'I ') as TRANSACAO,
+					beneficiario.CPF as CHAVE_SEGURADO,
+					beneficiario.NOME as NOME_SEGURADO,
+					contatoMailing.EMAIL as EMAIL,
+					beneficiario.RG as RG_SEGURADO,
+					beneficiario.ORGAO_EXPEDIDOR as ORGAO_EMISSOR,
+					CASE WHEN beneficiario.DATA_EXPEDICAO IS NULL THEN '' ELSE REPLACE(CONVERT(VARCHAR(16), beneficiario.DATA_EXPEDICAO, 103), '/', '') END as DATA_EMISSAO,
+					beneficiario.CPF as CPF_SEGURADO,
+					beneficiario.SEXO as SEXO_SEGURADO,
+					CASE WHEN beneficiario.DATA_NASCIMENTO IS NULL THEN '' ELSE REPLACE(CONVERT(VARCHAR(16), beneficiario.DATA_NASCIMENTO, 103), '/', '') END AS DATA_NASC_SEGURADO,
+					estadoCivil.CODIGO as NUMERO_ESTADO_CIVIL,
+					contatoMailing.ENDERECO as ENDERECO_SEGURADO,
+					'' as COMPLEMENTO,
+					contatoMailing.BAIRRO as BAIRRO_SEGURADO,
+					contatoMailing.NUMERO_ENDERECO as NUM_ENDERECO_SEGURADO,
+					contatoMailing.CIDADE as CIDADE_SEGURADO,
+					contatoMailing.UF as ESTADO_SEGURADO,
+					contatoMailing.CEP as CEP_SEGURADO,
+					profissao.NOME as PROFISSAO_SEGURADO,
+					isnull(substring(contatoMailing.FONE_RESIDENCIAL,1,2),'') as DDD_TELEFONE_RES,
+					isnull(substring(contatoMailing.FONE_RESIDENCIAL,3,len(contatoMailing.FONE_RESIDENCIAL)),'') as NUM_TELEFONE_RES,
+					'' as RAMAL_TELEFONE_RES,
+					isnull(substring(contatoMailing.FONE_COMERCIAL,1,2),'') as DDD_TELEFONE_COM,
+					isnull(substring(contatoMailing.FONE_COMERCIAL,3,len(contatoMailing.FONE_COMERCIAL)),'') as NUM_TELEFONE_COM,
+					'' as RAMAL_TELEFONE_COM,
+					isnull(substring(contatoMailing.FONE_CELULAR,1,2),'') as DDD_TELEFONE_FAX_CELULAR,
+					isnull(substring(contatoMailing.FONE_CELULAR,3,len(contatoMailing.FONE_CELULAR)),'') as DDD_TELEFONE_FAX_CELULAR,
+					'' as DDD_TELEFONE_FAX_CELULAR,
+					parentesco.CODIGO_EXTERNO as TIPO_SEGURADO,
+					CASE WHEN plano.ID_TIPO_PLANO <> (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = 'NUVEM_VENDAS_TIPO_PLANO_FAMILIA')
+							THEN 
+								cast (venda.VALOR_TOTAL as varchar)
+							ELSE CASE 	WHEN parentesco.CODIGO_EXTERNO = '01' THEN 
+											cast (plano.VALOR_TITULAR_CONJUGE as varchar)
+										WHEN parentesco.CODIGO_EXTERNO = '02' THEN
+											'0'
+										WHEN parentesco.CODIGO_EXTERNO = '03' THEN
+											cast (plano.VALOR_POR_FILHO as varchar)
+										END
+					END as PREMIOS_SEGURADOS,
+					plano.CODIGO as PLANO,
+					'' as INICIO_VIGENCIA_SEGURADO,
+					'' as CAMPO_LIVRE_1,
+					'' as CAMPO_LIVRE_2,
+					'' as CAMPO_LIVRE_3,
+					'' as CAMPO_LIVRE_4,
+					'' as CAMPO_LIVRE,
+					cliente.SEQUENCIAL as NUMERO_SEQUENCIAL_SEGURADO,
+					'' as NUMERO_UNICO_SEGURADO_SITE,
+					CASE WHEN contatoMailing.FLAG_RECEBE_CERTIFICADO_EMAIL = 1 THEN '1' ELSE '2' END as OPCAO_RECEBER_EMAIL_CERTIFICADO,
+					venda.DATA_VENDA as DATA_OPCAO_RECEBIMENTO_EMAIL,
+					CASE WHEN contatoMailing.FLAG_RECEBE_OFERTAS_EMAIL = 1 THEN '1' ELSE '0' END as PERMITE_RECEBIMENTO_EMAIL_MARKETING,
+					venda.DATA_VENDA as DATA_OPCAO_RECEBIMENTO_EMAIL_MARKETING,
+					'' as FILLER,
+					:idHeader as ID_HEADER
+					
+			FROM
+					TB_NUVEM_VENDAS_REGISTRO_HEADER_PPLUS as header, TB_BENEFICIARIO as beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO as beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 		= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO as plano 									on beneficiarioPlano.ID_PLANO 			= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO as produto 								on plano.ID_PRODUTO 					= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA as venda 									on beneficiario.ID_VENDA 				= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA as cliente 						on venda.ID_CLIENTE_CAMPANHA 			= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING as contatoMailing 				on cliente.ID_CONTATO_MAILING 			= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING as loteMailing 						on contatoMailing.ID_LOTE_MAILING 		= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA as campanha 							on loteMailing.ID_CAMPANHA 				= campanha.ID_CAMPANHA
+INNER JOIN			TB_GRAU_PARENTESCO as parentesco					on beneficiario.ID_GRAU_PARENTESCO		= parentesco.ID_GRAU_PARENTESCO
+INNER JOIN 			TB_EVENTO as evento									on venda.ID_EVENTO					= evento.ID_EVENTO
+LEFT JOIN			TB_PROFISSAO as profissao							on venda.ID_PROFISSAO					= profissao.ID_PROFISSAO
+LEFT JOIN			TB_ESTADO_CIVIL as estadoCivil						on venda.ID_ESTADO_CIVIL				= estadoCivil.CODIGO
+			WHERE
+					venda.DATA_ENVIO IS NULL
+				AND   
+					venda.DATA_VENDA <= :dataEnvio
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND
+					produto.VALIDACAO_VENDA_PRODUTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoProduto)
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+        ]]>
+	</sql-query>
+	
+	
+	<sql-query name="LoteMailing.insertNuvemVendaRegistroDocumentoPPlus">
+		<![CDATA[
+		
+		INSERT INTO TB_NUVEM_VENDAS_REGISTRO_DOCUMENTO_PPLUS (TIPO_REGISTRO, LOTE_TRANSACAO, TRANSACAO, DATA_EMISSAO, INICIO_VIGENCIA, FIM_VIGENCIA, PREMIO_SEGURADO, FORMA_PARCELAMENTO, ESTIPULANTE, PERCENTUAL_DESCONTO, CAMPO_LIVRE_1, CAMPO_LIVRE_2, FILLER, ID_HEADER)
+			SELECT 
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroRegistro), '01') as TIPO_REGISTRO,
+					venda.ID_VENDA as LOTE_TRANSACAO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroTransacao), 'I ') as TRANSACAO,
+					REPLACE(CONVERT(VARCHAR(16), venda.DATA_VENDA, 103), '/', '') as DATA_EMISSAO,
+					'' as INICIO_VIGENCIA,
+					'' as FIM_VIGENCIA,
+					cast (venda.VALOR_TOTAL as varchar) as PREMIO_SEGURADO,			
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroParcelamento), '12')as FORMA_PARCELAMENTO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroEstipulante), '0001')as ESTIPULANTE,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroDesconto), '0')as PERCENTUAL_DESCONTO,
+					'' as CAMPO_LIVRE_1,
+					'' as CAMPO_LIVRE_2,
+					'' as FILLER,
+					:idHeader as ID_HEADER
+			FROM
+					TB_NUVEM_VENDAS_REGISTRO_HEADER_PPLUS as header, TB_BENEFICIARIO as beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO as beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 		= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO as plano 									on beneficiarioPlano.ID_PLANO 			= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO as produto 								on plano.ID_PRODUTO 					= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA as venda 									on beneficiario.ID_VENDA 				= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA as cliente 						on venda.ID_CLIENTE_CAMPANHA 			= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING as contatoMailing 				on cliente.ID_CONTATO_MAILING 			= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING as loteMailing 						on contatoMailing.ID_LOTE_MAILING 		= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA as campanha 							on loteMailing.ID_CAMPANHA 				= campanha.ID_CAMPANHA
+INNER JOIN 			TB_EVENTO as evento									on venda.ID_EVENTO						= evento.ID_EVENTO
+INNER JOIN			TB_GRAU_PARENTESCO as grauParentesco				on beneficiario.ID_GRAU_PARENTESCO		= grauParentesco.ID_GRAU_PARENTESCO
+			WHERE
+					venda.DATA_ENVIO IS NULL
+				AND   
+					venda.DATA_VENDA <= :dataEnvio
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND
+					produto.VALIDACAO_VENDA_PRODUTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoProduto)
+				AND
+					grauParentesco.CODIGO_EXTERNO = '01'
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+		
+        ]]>
+	</sql-query>
+	
+	<sql-query name="LoteMailing.countNuvemVendaRegistroHeaderPPlus">
+		<![CDATA[
+				SELECT COUNT(1) as QUANTIDADE_REGISTROS FROM TB_NUVEM_VENDAS_REGISTRO_HEADER_PPLUS
+        ]]>
+	</sql-query>
+	
+	<sql-query name="LoteMailing.insertNuvemVendaRegistroHeaderPPlus">
+		<![CDATA[
+		
+			SELECT DISTINCT
+					ISNULL((select top 1 parametro.VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA parametro where parametro.NOME_PARAMETRO_SISTEMA = :nomeParametroRegistro), '00') as TIPO_REGISTRO,
+					ISNULL((select top 1 parametro.VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA parametro where parametro.NOME_PARAMETRO_SISTEMA = :nomeParametroLayout), '001') as TIPO_LAYOUT,
+					ISNULL((select top 1 parametro.VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA parametro where parametro.NOME_PARAMETRO_SISTEMA = :nomeParametroCliente), '109') as CLIENTE,
+					produto.CODIGO as PRODUTO,
+					(SELECT parametro.VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA parametro WHERE parametro.NOME_PARAMETRO_SISTEMA = :identificacaoCampanha) as IDENTIFICACAO_CAMPANHA,
+					:dataEnvioFormat AS DATA_GERACAO,
+					'' as SEQUENCIAL_ARQUIVO,
+					'' as FILLER,
+					produto.SIGLA as SIGLA_PRODUTO,
+					loteMailing.ID_LOTE_MAILING as ID_LOTE_MAILING,
+					'' as NOME_ARQUIVO
+			FROM
+					TB_BENEFICIARIO beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 		= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO plano 									on beneficiarioPlano.ID_PLANO 			= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO produto 								on plano.ID_PRODUTO 					= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA venda 									on beneficiario.ID_VENDA 				= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA cliente 						on venda.ID_CLIENTE_CAMPANHA 			= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING contatoMailing 				on cliente.ID_CONTATO_MAILING 			= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING loteMailing 						on contatoMailing.ID_LOTE_MAILING 		= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA campanha 							on loteMailing.ID_CAMPANHA 				= campanha.ID_CAMPANHA
+INNER JOIN 			TB_EVENTO evento 								on venda.ID_EVENTO					= evento.ID_EVENTO
+			WHERE
+					venda.DATA_ENVIO IS NULL
+				AND   
+					venda.DATA_VENDA <= :dataEnvio
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT parametro.VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA parametro WHERE parametro.NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND
+					produto.VALIDACAO_VENDA_PRODUTO = (SELECT parametro.VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA parametro WHERE parametro.NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoProduto)
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+        ]]>
+	</sql-query>
+	
+	<sql-query name="LoteMailing.insertNuvemVendaCobrancaSegurados">
+		<![CDATA[
+			        INSERT INTO TB_NUVEM_VENDAS_REGISTRO_COBRANCA_SEGURADOS (TIPO_REGISTRO, LOTE_TRANSACAO, TRANSACAO,CHAVE_SEGURADO,NUMERO_MEIO_COBRANCA,NUMERO_ADM_COBRANCA,NUMERO_CICLO_ADM_COBRANCA,NUMERO_CARTAO_CREDITO,DATA_ANUIDADE_CARTAO_CREDITO,NUMERO_CONTA_CARTAO_CREDITO,NUMERO_BANCO ,NUMERO_AGENCIA ,NUMERO_CONTA ,NUMERO_FUNCIONARIO,NOME_FUNCIONARIO,NUMERO_TIPO_MEIO_COBRANCA,CAMPO_RESERVADO_MEIO_COBRANCA,FILLER, ID_HEADER)
+			SELECT 
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroRegistro), '05') as TIPO_REGISTRO,
+					venda.ID_VENDA as LOTE_TRANSACAO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroTransacao), 'I ') as TRANSACAO,
+					beneficiario.CPF as CHAVE_SEGURADO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :meioCobranca), '2') as NUMERO_MEIO_COBRANCA,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :adminCobranca), '97') as NUMERO_ADM_COBRANCA,
+					contatoMailing.DIA_VENCECIMENTO_FATURA as NUMERO_CICLO_ADM_COBRANCA,
+					contatoMailing.CARTAO as NUMERO_CARTAO_CREDITO,
+					'' as DATA_ANUIDADE_CARTAO_CREDITO,
+					'' as NUMERO_CONTA_CARTAO_CREDITO,
+					'' as NUMERO_BANCO,
+					'' as NUMERO_AGENCIA,
+					'' as NUMERO_CONTA,
+					'' as NUMERO_FUNCIONARIO,
+					'' as NOME_FUNCIONARIO,
+					'' as NUMERO_TIPO_MEIO_COBRANCA,
+					'' as CAMPO_RESERVADO_MEIO_COBRANCA,
+					'' as FILLER,
+					:idHeader as ID_HEADER
+			FROM
+					TB_BENEFICIARIO as beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO as beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 		= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO as plano 									on beneficiarioPlano.ID_PLANO 			= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO as produto 								on plano.ID_PRODUTO 					= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA as venda 									on beneficiario.ID_VENDA 				= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA as cliente 						on venda.ID_CLIENTE_CAMPANHA 			= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING as contatoMailing 				on cliente.ID_CONTATO_MAILING 			= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING as loteMailing 						on contatoMailing.ID_LOTE_MAILING 		= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA as campanha 							on loteMailing.ID_CAMPANHA 				= campanha.ID_CAMPANHA
+INNER JOIN 			TB_EVENTO as evento									on venda.ID_EVENTO					= evento.ID_EVENTO
+INNER JOIN			TB_GRAU_PARENTESCO as grauParentesco				on beneficiario.ID_GRAU_PARENTESCO		= grauParentesco.ID_GRAU_PARENTESCO
+			WHERE
+					venda.DATA_ENVIO IS NULL
+				AND   
+					venda.DATA_VENDA <= :dataEnvio
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND
+					produto.VALIDACAO_VENDA_PRODUTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoProduto)
+				AND
+					grauParentesco.CODIGO_EXTERNO = '01'
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+        ]]>
+	</sql-query>
+	
+	
+	<sql-query name="LoteMailing.insertNuvemVendaCobrancaSeguradosDhi">
+		<![CDATA[
+			        INSERT INTO TB_NUVEM_VENDAS_REGISTRO_COBRANCA_SEGURADOS_DHI (TIPO_REGISTRO, LOTE_TRANSACAO, TRANSACAO,CHAVE_SEGURADO,NUMERO_MEIO_COBRANCA,NUMERO_ADM_COBRANCA,NUMERO_CICLO_ADM_COBRANCA,NUMERO_CARTAO_CREDITO,DATA_ANUIDADE_CARTAO_CREDITO,NUMERO_CONTA_CARTAO_CREDITO,NUMERO_BANCO ,NUMERO_AGENCIA ,NUMERO_CONTA ,NUMERO_FUNCIONARIO,NOME_FUNCIONARIO,NUMERO_TIPO_MEIO_COBRANCA,CAMPO_RESERVADO_MEIO_COBRANCA,FILLER, ID_HEADER)
+			SELECT 
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroRegistro), '05') as TIPO_REGISTRO,
+					venda.ID_VENDA as LOTE_TRANSACAO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroTransacao), 'I ') as TRANSACAO,
+					beneficiario.CPF as CHAVE_SEGURADO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :meioCobranca), '2') as NUMERO_MEIO_COBRANCA,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :adminCobranca), '97') as NUMERO_ADM_COBRANCA,
+					contatoMailing.DIA_VENCECIMENTO_FATURA as NUMERO_CICLO_ADM_COBRANCA,
+					contatoMailing.CARTAO as NUMERO_CARTAO_CREDITO,
+					'' as DATA_ANUIDADE_CARTAO_CREDITO,
+					'' as NUMERO_CONTA_CARTAO_CREDITO,
+					'' as NUMERO_BANCO,
+					'' as NUMERO_AGENCIA,
+					'' as NUMERO_CONTA,
+					'' as NUMERO_FUNCIONARIO,
+					'' as NOME_FUNCIONARIO,
+					'' as NUMERO_TIPO_MEIO_COBRANCA,
+					'' as CAMPO_RESERVADO_MEIO_COBRANCA,
+					'' as FILLER,
+					:idHeader as ID_HEADER
+			FROM
+					TB_BENEFICIARIO as beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO as beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 		= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO as plano 									on beneficiarioPlano.ID_PLANO 			= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO as produto 								on plano.ID_PRODUTO 					= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA as venda 									on beneficiario.ID_VENDA 				= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA as cliente 						on venda.ID_CLIENTE_CAMPANHA 			= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING as contatoMailing 				on cliente.ID_CONTATO_MAILING 			= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING as loteMailing 						on contatoMailing.ID_LOTE_MAILING 		= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA as campanha 							on loteMailing.ID_CAMPANHA 				= campanha.ID_CAMPANHA
+INNER JOIN 			TB_EVENTO as evento									on venda.ID_EVENTO					= evento.ID_EVENTO
+INNER JOIN			TB_GRAU_PARENTESCO as grauParentesco				on beneficiario.ID_GRAU_PARENTESCO		= grauParentesco.ID_GRAU_PARENTESCO
+			WHERE
+					venda.DATA_ENVIO IS NULL
+				AND   
+					venda.DATA_VENDA <= :dataEnvio
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND
+					produto.VALIDACAO_VENDA_PRODUTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoProduto)
+				AND
+					grauParentesco.CODIGO_EXTERNO = '01'
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+        ]]>
+	</sql-query>
+	
+	
+	<sql-query name="LoteMailing.insertNuvemVendaCadastroSegurados">
+		<![CDATA[
+		
+		INSERT INTO TB_NUVEM_VENDAS_REGISTRO_CADASTRO_SEGURADOS (TIPO_REGISTRO,	LOTE_TRANSACAO,	TRANSACAO,	CHAVE_SEGURADO,	NOME_SEGURADO,	EMAIL,	RG_SEGURADO,	ORGAO_EMISSOR,	DATA_EMISSAO,	CPF_SEGURADO,	SEXO_SEGURADO,	DATA_NASC_SEGURADO,	NUMERO_ESTADO_CIVIL,	ENDERECO_SEGURADO,	COMPLEMENTO,	BAIRRO_SEGURADO,	NUM_ENDERECO_SEGURADO,	CIDADE_SEGURADO,	ESTADO_SEGURADO,	CEP_SEGURADO,	PROFISSAO_SEGURADO,	DDD_TELEFONE_RES,	NUM_TELEFONE_RES,	RAMAL_TELEFONE_RES,	DDD_TELEFONE_COM,	NUM_TELEFONE_COM,	RAMAL_TELEFONE_COM,	DDD_TELEFONE_FAX_CELULAR,	NUM_TELEFONE_FAX_CELULAR,	RAMAL_TELEFONE_FAX_CELULAR,	TIPO_SEGURADO,	PREMIOS_SEGURADOS,	PLANO,	INICIO_VIGENCIA_SEGURADO,	CAMPO_LIVRE_1,	CAMPO_LIVRE_2,	CAMPO_LIVRE_3,	CAMPO_LIVRE_4,	CAMPO_LIVRE,	NUMERO_SEQUENCIAL_SEGURADO,	NUMERO_UNICO_SEGURADO_SITE,	OPCAO_RECEBER_EMAIL_CERTIFICADO,	DATA_OPCAO_RECEBIMENTO_EMAIL,	PERMITE_RECEBIMENTO_EMAIL_MARKETING,	DATA_OPCAO_RECEBIMENTO_EMAIL_MARKETING,	FILLER, ID_HEADER	)
+			SELECT 
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroRegistro), '05') as TIPO_REGISTRO,
+					venda.ID_VENDA as LOTE_TRANSACAO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroTransacao), 'I ') as TRANSACAO,
+					beneficiario.CPF as CHAVE_SEGURADO,
+					beneficiario.NOME as NOME_SEGURADO,
+					contatoMailing.EMAIL as EMAIL,
+					beneficiario.RG as RG_SEGURADO,
+					beneficiario.ORGAO_EXPEDIDOR as ORGAO_EMISSOR,
+					CASE WHEN beneficiario.DATA_EXPEDICAO IS NULL THEN '' ELSE REPLACE(CONVERT(VARCHAR(16), beneficiario.DATA_EXPEDICAO, 103), '/', '') END as DATA_EMISSAO,
+					beneficiario.CPF as CPF_SEGURADO,
+					beneficiario.SEXO as SEXO_SEGURADO,
+					CASE WHEN beneficiario.DATA_NASCIMENTO IS NULL THEN '' ELSE REPLACE(CONVERT(VARCHAR(16), beneficiario.DATA_NASCIMENTO, 103), '/', '') END as DATA_NASC_SEGURADO,
+					estadoCivil.CODIGO as NUMERO_ESTADO_CIVIL,
+					contatoMailing.ENDERECO as ENDERECO_SEGURADO,
+					'' as COMPLEMENTO,
+					contatoMailing.BAIRRO as BAIRRO_SEGURADO,
+					contatoMailing.NUMERO_ENDERECO as NUM_ENDERECO_SEGURADO,
+					contatoMailing.CIDADE as CIDADE_SEGURADO,
+					contatoMailing.UF as ESTADO_SEGURADO,
+					contatoMailing.CEP as CEP_SEGURADO,
+					profissao.NOME as PROFISSAO_SEGURADO,
+					isnull(substring(contatoMailing.FONE_RESIDENCIAL,1,2),'') as DDD_TELEFONE_RES,
+					isnull(substring(contatoMailing.FONE_RESIDENCIAL,3,len(contatoMailing.FONE_RESIDENCIAL)),'') as NUM_TELEFONE_RES,
+					'' as RAMAL_TELEFONE_RES,
+					isnull(substring(contatoMailing.FONE_COMERCIAL,1,2),'') as DDD_TELEFONE_COM,
+					isnull(substring(contatoMailing.FONE_COMERCIAL,3,len(contatoMailing.FONE_COMERCIAL)),'') as NUM_TELEFONE_COM,
+					'' as RAMAL_TELEFONE_COM,
+					isnull(substring(contatoMailing.FONE_CELULAR,1,2),'') as DDD_TELEFONE_FAX_CELULAR,
+					isnull(substring(contatoMailing.FONE_CELULAR,3,len(contatoMailing.FONE_CELULAR)),'') as DDD_TELEFONE_FAX_CELULAR,
+					'' as DDD_TELEFONE_FAX_CELULAR,
+					parentesco.CODIGO_EXTERNO as TIPO_SEGURADO,
+					CASE 	WHEN parentesco.CODIGO_EXTERNO = '01' THEN 
+						cast (plano.VALOR_PREMIO as varchar)
+					ELSE
+						'0'
+					END as PREMIOS_SEGURADOS,
+					plano.CODIGO as PLANO,
+					'' as INICIO_VIGENCIA_SEGURADO,
+					'' as CAMPO_LIVRE_1,
+					'' as CAMPO_LIVRE_2,
+					'' as CAMPO_LIVRE_3,
+					'' as CAMPO_LIVRE_4,
+					'' as CAMPO_LIVRE,
+					cliente.SEQUENCIAL as NUMERO_SEQUENCIAL_SEGURADO,
+					'' as NUMERO_UNICO_SEGURADO_SITE,
+					CASE WHEN contatoMailing.FLAG_RECEBE_CERTIFICADO_EMAIL = 1 THEN '1' ELSE '2' END as OPCAO_RECEBER_EMAIL_CERTIFICADO,
+					venda.DATA_VENDA as DATA_OPCAO_RECEBIMENTO_EMAIL,
+					CASE WHEN contatoMailing.FLAG_RECEBE_OFERTAS_EMAIL = 1 THEN '1' ELSE '0' END as PERMITE_RECEBIMENTO_EMAIL_MARKETING,
+					venda.DATA_VENDA as DATA_OPCAO_RECEBIMENTO_EMAIL_MARKETING,
+					'' as FILLER,
+					:idHeader as ID_HEADER
+					
+			FROM
+					TB_BENEFICIARIO as beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO as beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 		= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO as plano 									on beneficiarioPlano.ID_PLANO 			= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO as produto 								on plano.ID_PRODUTO 					= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA as venda 									on beneficiario.ID_VENDA 				= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA as cliente 						on venda.ID_CLIENTE_CAMPANHA 			= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING as contatoMailing 				on cliente.ID_CONTATO_MAILING 			= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING as loteMailing 						on contatoMailing.ID_LOTE_MAILING 		= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA as campanha 							on loteMailing.ID_CAMPANHA 				= campanha.ID_CAMPANHA
+INNER JOIN			TB_GRAU_PARENTESCO as parentesco					on beneficiario.ID_GRAU_PARENTESCO		= parentesco.ID_GRAU_PARENTESCO
+INNER JOIN 			TB_EVENTO as evento									on venda.ID_EVENTO					= evento.ID_EVENTO
+LEFT JOIN			TB_PROFISSAO as profissao							on venda.ID_PROFISSAO					= profissao.ID_PROFISSAO
+LEFT JOIN			TB_ESTADO_CIVIL as estadoCivil						on venda.ID_ESTADO_CIVIL				= estadoCivil.CODIGO
+			WHERE
+					venda.DATA_ENVIO IS NULL
+				AND   
+					venda.DATA_VENDA <= :dataEnvio
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND
+					produto.VALIDACAO_VENDA_PRODUTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoProduto)
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+		
+        ]]>
+	</sql-query>
+	
+	
+	<sql-query name="LoteMailing.insertNuvemVendaCadastroSeguradosDhi">
+		<![CDATA[
+		
+		INSERT INTO TB_NUVEM_VENDAS_REGISTRO_CADASTRO_SEGURADOS_DHI (TIPO_REGISTRO,	LOTE_TRANSACAO,	TRANSACAO,	CHAVE_SEGURADO,	NOME_SEGURADO,	EMAIL,	RG_SEGURADO,	ORGAO_EMISSOR,	DATA_EMISSAO,	CPF_SEGURADO,	SEXO_SEGURADO,	DATA_NASC_SEGURADO,	NUMERO_ESTADO_CIVIL,	ENDERECO_SEGURADO,	COMPLEMENTO,	BAIRRO_SEGURADO,	NUM_ENDERECO_SEGURADO,	CIDADE_SEGURADO,	ESTADO_SEGURADO,	CEP_SEGURADO,	PROFISSAO_SEGURADO,	DDD_TELEFONE_RES,	NUM_TELEFONE_RES,	RAMAL_TELEFONE_RES,	DDD_TELEFONE_COM,	NUM_TELEFONE_COM,	RAMAL_TELEFONE_COM,	DDD_TELEFONE_FAX_CELULAR,	NUM_TELEFONE_FAX_CELULAR,	RAMAL_TELEFONE_FAX_CELULAR,	TIPO_SEGURADO,	PREMIOS_SEGURADOS,	PLANO,	INICIO_VIGENCIA_SEGURADO,	CAMPO_LIVRE_1,	CAMPO_LIVRE_2,	CAMPO_LIVRE_3,	CAMPO_LIVRE_4,	CAMPO_LIVRE,	NUMERO_SEQUENCIAL_SEGURADO,	NUMERO_UNICO_SEGURADO_SITE,	OPCAO_RECEBER_EMAIL_CERTIFICADO,	DATA_OPCAO_RECEBIMENTO_EMAIL,	PERMITE_RECEBIMENTO_EMAIL_MARKETING,	DATA_OPCAO_RECEBIMENTO_EMAIL_MARKETING,	FILLER, ID_HEADER	)
+			SELECT 
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroRegistro), '05') as TIPO_REGISTRO,
+					venda.ID_VENDA as LOTE_TRANSACAO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroTransacao), 'I ') as TRANSACAO,
+					beneficiario.CPF as CHAVE_SEGURADO,
+					beneficiario.NOME as NOME_SEGURADO,
+					contatoMailing.EMAIL as EMAIL,
+					beneficiario.RG as RG_SEGURADO,
+					beneficiario.ORGAO_EXPEDIDOR as ORGAO_EMISSOR,
+					CASE WHEN beneficiario.DATA_EXPEDICAO IS NULL THEN '' ELSE REPLACE(CONVERT(VARCHAR(16), beneficiario.DATA_EXPEDICAO, 103), '/', '') END as DATA_EMISSAO,
+					beneficiario.CPF as CPF_SEGURADO,
+					beneficiario.SEXO as SEXO_SEGURADO,
+					CASE WHEN beneficiario.DATA_NASCIMENTO IS NULL THEN '' ELSE REPLACE(CONVERT(VARCHAR(16), beneficiario.DATA_NASCIMENTO, 103), '/', '') END as DATA_NASC_SEGURADO,
+					estadoCivil.CODIGO as NUMERO_ESTADO_CIVIL,
+					contatoMailing.ENDERECO as ENDERECO_SEGURADO,
+					'' as COMPLEMENTO,
+					contatoMailing.BAIRRO as BAIRRO_SEGURADO,
+					contatoMailing.NUMERO_ENDERECO as NUM_ENDERECO_SEGURADO,
+					contatoMailing.CIDADE as CIDADE_SEGURADO,
+					contatoMailing.UF as ESTADO_SEGURADO,
+					contatoMailing.CEP as CEP_SEGURADO,
+					profissao.NOME as PROFISSAO_SEGURADO,
+					isnull(substring(contatoMailing.FONE_RESIDENCIAL,1,2),'') as DDD_TELEFONE_RES,
+					isnull(substring(contatoMailing.FONE_RESIDENCIAL,3,len(contatoMailing.FONE_RESIDENCIAL)),'') as NUM_TELEFONE_RES,
+					'' as RAMAL_TELEFONE_RES,
+					isnull(substring(contatoMailing.FONE_COMERCIAL,1,2),'') as DDD_TELEFONE_COM,
+					isnull(substring(contatoMailing.FONE_COMERCIAL,3,len(contatoMailing.FONE_COMERCIAL)),'') as NUM_TELEFONE_COM,
+					'' as RAMAL_TELEFONE_COM,
+					isnull(substring(contatoMailing.FONE_CELULAR,1,2),'') as DDD_TELEFONE_FAX_CELULAR,
+					isnull(substring(contatoMailing.FONE_CELULAR,3,len(contatoMailing.FONE_CELULAR)),'') as DDD_TELEFONE_FAX_CELULAR,
+					'' as DDD_TELEFONE_FAX_CELULAR,
+					parentesco.CODIGO_EXTERNO as TIPO_SEGURADO,
+					CASE 	WHEN parentesco.CODIGO_EXTERNO = '01' THEN 
+						cast (plano.VALOR_PREMIO as varchar)
+					ELSE
+						'0'
+					END as PREMIOS_SEGURADOS,
+					plano.CODIGO as PLANO,
+					'' as INICIO_VIGENCIA_SEGURADO,
+					'' as CAMPO_LIVRE_1,
+					'' as CAMPO_LIVRE_2,
+					'' as CAMPO_LIVRE_3,
+					'' as CAMPO_LIVRE_4,
+					'' as CAMPO_LIVRE,
+					cliente.SEQUENCIAL as NUMERO_SEQUENCIAL_SEGURADO,
+					'' as NUMERO_UNICO_SEGURADO_SITE,
+					CASE WHEN contatoMailing.FLAG_RECEBE_CERTIFICADO_EMAIL = 1 THEN '1' ELSE '2' END as OPCAO_RECEBER_EMAIL_CERTIFICADO,
+					venda.DATA_VENDA as DATA_OPCAO_RECEBIMENTO_EMAIL,
+					CASE WHEN contatoMailing.FLAG_RECEBE_OFERTAS_EMAIL = 1 THEN '1' ELSE '0' END as PERMITE_RECEBIMENTO_EMAIL_MARKETING,
+					venda.DATA_VENDA as DATA_OPCAO_RECEBIMENTO_EMAIL_MARKETING,
+					'' as FILLER,
+					:idHeader as ID_HEADER
+					
+			FROM
+					TB_BENEFICIARIO as beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO as beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 		= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO as plano 									on beneficiarioPlano.ID_PLANO 			= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO as produto 								on plano.ID_PRODUTO 					= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA as venda 									on beneficiario.ID_VENDA 				= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA as cliente 						on venda.ID_CLIENTE_CAMPANHA 			= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING as contatoMailing 				on cliente.ID_CONTATO_MAILING 			= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING as loteMailing 						on contatoMailing.ID_LOTE_MAILING 		= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA as campanha 							on loteMailing.ID_CAMPANHA 				= campanha.ID_CAMPANHA
+INNER JOIN			TB_GRAU_PARENTESCO as parentesco					on beneficiario.ID_GRAU_PARENTESCO		= parentesco.ID_GRAU_PARENTESCO
+INNER JOIN 			TB_EVENTO as evento									on venda.ID_EVENTO					= evento.ID_EVENTO
+LEFT JOIN			TB_PROFISSAO as profissao							on venda.ID_PROFISSAO					= profissao.ID_PROFISSAO
+LEFT JOIN			TB_ESTADO_CIVIL as estadoCivil						on venda.ID_ESTADO_CIVIL				= estadoCivil.CODIGO
+			WHERE
+					venda.DATA_ENVIO IS NULL
+				AND   
+					venda.DATA_VENDA <= :dataEnvio
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND
+					produto.VALIDACAO_VENDA_PRODUTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoProduto)
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+		
+        ]]>
+	</sql-query>
+	
+	
+	<sql-query name="LoteMailing.insertNuvemVendaRegistroDocumento">
+		<![CDATA[
+		
+		INSERT INTO TB_NUVEM_VENDAS_REGISTRO_DOCUMENTO (TIPO_REGISTRO, LOTE_TRANSACAO, TRANSACAO, DATA_EMISSAO, INICIO_VIGENCIA, FIM_VIGENCIA, PREMIO_SEGURADO, FORMA_PARCELAMENTO, ESTIPULANTE, PERCENTUAL_DESCONTO, CAMPO_LIVRE_1, CAMPO_LIVRE_2, FILLER, ID_HEADER)
+			SELECT 
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroRegistro), '01') as TIPO_REGISTRO,
+					venda.ID_VENDA as LOTE_TRANSACAO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroTransacao), 'I ') as TRANSACAO,
+					REPLACE(CONVERT(VARCHAR(16), venda.DATA_VENDA, 103), '/', '') as DATA_EMISSAO,
+					'' as INICIO_VIGENCIA,
+					'' as FIM_VIGENCIA,
+					cast (venda.VALOR_TOTAL as varchar) as PREMIO_SEGURADO,			
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroParcelamento), '12')as FORMA_PARCELAMENTO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroEstipulante), '0001')as ESTIPULANTE,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroDesconto), '0')as PERCENTUAL_DESCONTO,
+					'' as CAMPO_LIVRE_1,
+					'' as CAMPO_LIVRE_2,
+					'' as FILLER,
+					:idHeader as ID_HEADER
+			FROM
+					TB_BENEFICIARIO as beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO as beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 		= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO as plano 									on beneficiarioPlano.ID_PLANO 			= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO as produto 								on plano.ID_PRODUTO 					= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA as venda 									on beneficiario.ID_VENDA 				= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA as cliente 						on venda.ID_CLIENTE_CAMPANHA 			= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING as contatoMailing 				on cliente.ID_CONTATO_MAILING 			= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING as loteMailing 						on contatoMailing.ID_LOTE_MAILING 		= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA as campanha 							on loteMailing.ID_CAMPANHA 				= campanha.ID_CAMPANHA
+INNER JOIN 			TB_EVENTO as evento									on venda.ID_EVENTO					= evento.ID_EVENTO
+INNER JOIN			TB_GRAU_PARENTESCO as grauParentesco				on beneficiario.ID_GRAU_PARENTESCO		= grauParentesco.ID_GRAU_PARENTESCO
+			WHERE
+					venda.DATA_ENVIO IS NULL
+				AND   
+					venda.DATA_VENDA <= :dataEnvio
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND
+					produto.VALIDACAO_VENDA_PRODUTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoProduto)
+				AND
+					grauParentesco.CODIGO_EXTERNO = '01'
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+				
+		
+        ]]>
+	</sql-query>
+	
+	
+	<sql-query name="LoteMailing.insertNuvemVendaRegistroDocumentoDhi">
+		<![CDATA[
+		
+		INSERT INTO TB_NUVEM_VENDAS_REGISTRO_DOCUMENTO_DHI (TIPO_REGISTRO, LOTE_TRANSACAO, TRANSACAO, DATA_EMISSAO, INICIO_VIGENCIA, FIM_VIGENCIA, PREMIO_SEGURADO, FORMA_PARCELAMENTO, ESTIPULANTE, PERCENTUAL_DESCONTO, CAMPO_LIVRE_1, CAMPO_LIVRE_2, FILLER, ID_HEADER)
+			SELECT 
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroRegistro), '01') as TIPO_REGISTRO,
+					venda.ID_VENDA as LOTE_TRANSACAO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroTransacao), 'I ') as TRANSACAO,
+					REPLACE(CONVERT(VARCHAR(16), venda.DATA_VENDA, 103), '/', '') as DATA_EMISSAO,
+					'' as INICIO_VIGENCIA,
+					'' as FIM_VIGENCIA,
+					cast (venda.VALOR_TOTAL as varchar) as PREMIO_SEGURADO,			
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroParcelamento), '12')as FORMA_PARCELAMENTO,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroEstipulante), '0001')as ESTIPULANTE,
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroDesconto), '0')as PERCENTUAL_DESCONTO,
+					'' as CAMPO_LIVRE_1,
+					'' as CAMPO_LIVRE_2,
+					'' as FILLER,
+					:idHeader as ID_HEADER
+			FROM
+					TB_BENEFICIARIO as beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO as beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 		= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO as plano 									on beneficiarioPlano.ID_PLANO 			= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO as produto 								on plano.ID_PRODUTO 					= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA as venda 									on beneficiario.ID_VENDA 				= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA as cliente 						on venda.ID_CLIENTE_CAMPANHA 			= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING as contatoMailing 				on cliente.ID_CONTATO_MAILING 			= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING as loteMailing 						on contatoMailing.ID_LOTE_MAILING 		= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA as campanha 							on loteMailing.ID_CAMPANHA 				= campanha.ID_CAMPANHA
+INNER JOIN 			TB_EVENTO as evento									on venda.ID_EVENTO					= evento.ID_EVENTO
+INNER JOIN			TB_GRAU_PARENTESCO as grauParentesco				on beneficiario.ID_GRAU_PARENTESCO		= grauParentesco.ID_GRAU_PARENTESCO
+			WHERE
+					venda.DATA_ENVIO IS NULL
+				AND   
+					venda.DATA_VENDA <= :dataEnvio
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND
+					produto.VALIDACAO_VENDA_PRODUTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoProduto)
+				AND
+					grauParentesco.CODIGO_EXTERNO = '01'
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+				
+		
+        ]]>
+	</sql-query>
+	
+	
+	<sql-query name="LoteMailing.selectSequencialPorCampanha">
+		<![CDATA[
+				SELECT SEQUENCIAL FROM TB_CONTROLE_SEQUENCIAL_VENDA_HEADER controleSequencial WHERE ID_CAMPANHA = :idCampanha
+		]]>
+	</sql-query>
+	
+	<sql-query name="LoteMailing.insertSequencialCampanha">
+		<![CDATA[
+				INSERT INTO TB_CONTROLE_SEQUENCIAL_VENDA_HEADER (ID_CAMPANHA,SEQUENCIAL) VALUES (:idCampanha, :sequencial)
+		]]>
+	</sql-query>
+	
+	<sql-query name="LoteMailing.updateSequencialCampanha">
+		<![CDATA[
+				UPDATE TB_CONTROLE_SEQUENCIAL_VENDA_HEADER SET SEQUENCIAL = :sequencial WHERE ID_CAMPANHA = :idCampanha
+		]]>
+	</sql-query>
+	
+	<sql-query name="LoteMailing.selectIdentCurrentHeader">
+		<![CDATA[
+				SELECT IDENT_CURRENT( 'TB_NUVEM_VENDAS_REGISTRO_HEADER' )
+		]]>
+	</sql-query>
+	
+	<sql-query name="LoteMailing.selectIdentCurrentHeaderPlus">
+		<![CDATA[
+				SELECT IDENT_CURRENT( 'TB_NUVEM_VENDAS_REGISTRO_HEADER_PPLUS' )
+		]]>
+	</sql-query>
+	
+	
+	<sql-query name="LoteMailing.updateSequencialHeader">
+		<![CDATA[
+				UPDATE TB_NUVEM_VENDAS_REGISTRO_HEADER SET SEQUENCIAL_ARQUIVO = replicate('0', 7 - len(:sequencial)) + cast (:sequencial as varchar) WHERE ID = :sequencial
+		]]>
+	</sql-query>
+	
+	<sql-query name="LoteMailing.updateSequencialHeaderPPLus">
+		<![CDATA[
+				UPDATE TB_NUVEM_VENDAS_REGISTRO_HEADER_PPLUS SET SEQUENCIAL_ARQUIVO = replicate('0', 7 - len(:sequencial)) + cast (:sequencial as varchar) WHERE ID = :sequencial
+		]]>
+	</sql-query>
+	
+	<sql-query name="LoteMailing.updateSequencialHeaderDhi">
+		<![CDATA[
+				UPDATE TB_NUVEM_VENDAS_REGISTRO_HEADER_DHI SET SEQUENCIAL_ARQUIVO = replicate('0', 7 - len(:sequencial)) + cast (:sequencial as varchar) WHERE ID = :sequencial
+		]]>
+	</sql-query>
+	
+	<sql-query name="LoteMailing.insertNuvemVendaRegistroHeader">
+		<![CDATA[
+		
+		
+		
+			SELECT DISTINCT TOP 1
+					ISNULL((select top 1 parametro.VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA parametro where parametro.NOME_PARAMETRO_SISTEMA = :nomeParametroRegistro), '00') as TIPO_REGISTRO,
+					ISNULL((select top 1 parametro.VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA parametro where parametro.NOME_PARAMETRO_SISTEMA = :nomeParametroLayout), '001') as TIPO_LAYOUT,
+					ISNULL((select top 1 parametro.VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA parametro where parametro.NOME_PARAMETRO_SISTEMA = :nomeParametroCliente), '109')as CLIENTE,
+					produto.CODIGO as PRODUTO,
+					ISNULL((SELECT top 1 parametro.VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA parametro WHERE parametro.NOME_PARAMETRO_SISTEMA = :identificacaoCampanha), '20000000') as IDENTIFICACAO_CAMPANHA,
+					:dataEnvioFormat as DATA_GERACAO,
+					'' as SEQUENCIAL_ARQUIVO,
+					'' as FILLER,
+					produto.SIGLA as SIGLA_PRODUTO,
+					loteMailing.ID_LOTE_MAILING as ID_LOTE_MAILING,
+					'' as NOME_ARQUIVO
+			FROM
+					TB_BENEFICIARIO beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 		= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO plano 									on beneficiarioPlano.ID_PLANO 			= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO produto 								on plano.ID_PRODUTO 					= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA venda 									on beneficiario.ID_VENDA 				= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA cliente 						on venda.ID_CLIENTE_CAMPANHA 			= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING contatoMailing 				on cliente.ID_CONTATO_MAILING 			= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING loteMailing 						on contatoMailing.ID_LOTE_MAILING 		= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA campanha 							on loteMailing.ID_CAMPANHA 				= campanha.ID_CAMPANHA
+INNER JOIN 			TB_EVENTO evento 								on venda.ID_EVENTO					= evento.ID_EVENTO
+			WHERE
+					venda.DATA_ENVIO IS NULL
+				AND   
+					venda.DATA_VENDA <= :dataEnvio
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT parametro.VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA parametro WHERE parametro.NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND
+					produto.VALIDACAO_VENDA_PRODUTO = (SELECT parametro.VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA parametro WHERE parametro.NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoProduto)
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+					
+        ]]>
+	</sql-query>
+	
+	
+		<sql-query name="LoteMailing.insertNuvemVendaRegistroHeaderDhi">
+		<![CDATA[
+		
+		
+		
+			SELECT DISTINCT TOP 1
+					ISNULL((select top 1 parametro.VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA parametro where parametro.NOME_PARAMETRO_SISTEMA = :nomeParametroRegistro), '00') as TIPO_REGISTRO,
+					ISNULL((select top 1 parametro.VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA parametro where parametro.NOME_PARAMETRO_SISTEMA = :nomeParametroCliente), '109')as CLIENTE,
+					produto.CODIGO as PRODUTO,
+					ISNULL((SELECT top 1 parametro.VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA parametro WHERE parametro.NOME_PARAMETRO_SISTEMA = :identificacaoCampanha), '20000000') as IDENTIFICACAO_CAMPANHA,
+					:dataEnvioFormat as DATA_GERACAO,
+					'' as SEQUENCIAL_ARQUIVO,
+					'' as FILLER,
+					produto.SIGLA as SIGLA_PRODUTO,
+					loteMailing.ID_LOTE_MAILING as ID_LOTE_MAILING,
+					'' as NOME_ARQUIVO
+			FROM
+					TB_BENEFICIARIO beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 		= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO plano 									on beneficiarioPlano.ID_PLANO 			= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO produto 								on plano.ID_PRODUTO 					= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA venda 									on beneficiario.ID_VENDA 				= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA cliente 						on venda.ID_CLIENTE_CAMPANHA 			= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING contatoMailing 				on cliente.ID_CONTATO_MAILING 			= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING loteMailing 						on contatoMailing.ID_LOTE_MAILING 		= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA campanha 							on loteMailing.ID_CAMPANHA 				= campanha.ID_CAMPANHA
+INNER JOIN 			TB_EVENTO evento 								on venda.ID_EVENTO					= evento.ID_EVENTO
+			WHERE
+					venda.DATA_ENVIO IS NULL
+				AND   
+					venda.DATA_VENDA <= :dataEnvio
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT parametro.VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA parametro WHERE parametro.NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND
+					produto.VALIDACAO_VENDA_PRODUTO = (SELECT parametro.VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA parametro WHERE parametro.NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoProduto)
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+					
+        ]]>
+	</sql-query>
+	
+	
+	<sql-query name="LoteMailing.insertNuvemTipoRegistroStatus">
+		<![CDATA[
+		
+		INSERT INTO TB_NUVEM_TIPO_REGISTRO_STATUS (TIPO_REGISTRO, CHAVE_SEGURADO, NOME_SEGURADO, CPF, STATUS)
+			SELECT 
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroSistema), '01') as TIPO_REGISTRO,
+					contatoMailing.CARTAO as CHAVE_SEGURADO,
+					beneficiario.NOME as NOME_SEGURADO,
+					beneficiario.CPF as CPF,
+					evento.NOME_EVENTO as STATUS
+			FROM
+					TB_BENEFICIARIO as beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO as beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 		= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO as plano 									on beneficiarioPlano.ID_PLANO 			= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO as produto 								on plano.ID_PRODUTO 					= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA as venda 									on beneficiario.ID_VENDA 				= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA as cliente 						on venda.ID_CLIENTE_CAMPANHA 			= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING as contatoMailing 				on cliente.ID_CONTATO_MAILING 			= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING as loteMailing 						on contatoMailing.ID_LOTE_MAILING 		= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA as campanha 							on loteMailing.ID_CAMPANHA 				= campanha.ID_CAMPANHA
+INNER JOIN 			TB_EVENTO as evento 								on venda.ID_EVENTO		 			= evento.ID_EVENTO
+INNER JOIN			TB_GRAU_PARENTESCO as grauParentesco				on beneficiario.ID_GRAU_PARENTESCO		= grauParentesco.ID_GRAU_PARENTESCO
+
+			WHERE
+					loteMailing.ID_LOTE_MAILING = :idLoteMailing
+				AND 
+					loteMailing.FLAG_MAILING_FINALIZADO = 1
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND
+					grauParentesco.CODIGO_EXTERNO = '01'
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+		
+        ]]>
+	</sql-query>
+	
+	
+	<sql-query name="LoteMailing.insertNuvemTipoRegistroHeader">
+		<![CDATA[
+		
+		INSERT INTO TB_NUVEM_TIPO_REGISTRO_HEADER (TIPO_REGISTRO, PRODUTO, CAMPANHA, DATA_GERACAO, FILLER)
+			SELECT DISTINCT
+					ISNULL((select top 1 VALOR_PARAMETRO_SISTEMA from TB_PARAMETRO_SISTEMA  where NOME_PARAMETRO_SISTEMA = :nomeParametroSistema), '00') as TIPO_REGISTRO,
+					produto.CODIGO as PRODUTO,
+					campanha.CODIGO_EXTERNO as CAMPANHA, 
+					REPLACE(CONVERT(VARCHAR(16), getDate(), 103), '/', '') as DATA_GERACAO,
+					'' as FILLER
+			FROM
+					TB_BENEFICIARIO as beneficiario 
+INNER JOIN			TB_BENEFICIARIO_PLANO as beneficiarioPlano  		on beneficiario.ID_BENEFICIARIO 		= beneficiarioPlano.ID_BENEFICIARIO
+INNER JOIN			TB_PLANO as plano 									on beneficiarioPlano.ID_PLANO 			= plano.ID_PLANO
+INNER JOIN			TB_PRODUTO as produto 								on plano.ID_PRODUTO 					= produto.ID_PRODUTO
+INNER JOIN			TB_VENDA as venda 									on beneficiario.ID_VENDA 				= venda.ID_VENDA
+INNER JOIN			TB_CLIENTE_CAMPANHA as cliente 						on venda.ID_CLIENTE_CAMPANHA 			= cliente.ID_CLIENTE_CAMPANHA 
+INNER JOIN 			TB_CONTATO_MAILING as contatoMailing 				on cliente.ID_CONTATO_MAILING 			= contatoMailing.ID_CONTATO_MAILING
+INNER JOIN 			TB_LOTE_MAILING as loteMailing 						on contatoMailing.ID_LOTE_MAILING 		= loteMailing.ID_LOTE_MAILING
+INNER JOIN 			TB_CAMPANHA as campanha 							on loteMailing.ID_CAMPANHA 				= campanha.ID_CAMPANHA
+INNER JOIN 			TB_EVENTO as evento 								on venda.ID_EVENTO		 			= evento.ID_EVENTO
+			WHERE
+					loteMailing.ID_LOTE_MAILING = :idLoteMailing
+				AND 
+					loteMailing.FLAG_MAILING_FINALIZADO = 1
+				AND 
+					evento.ID_TIPO_EVENTO = (SELECT VALOR_PARAMETRO_SISTEMA FROM TB_PARAMETRO_SISTEMA WHERE NOME_PARAMETRO_SISTEMA = :referenciaVendaTipoEvento)
+				AND 
+					venda.FLAG_VENDA_FECHADA = 1
+		
+        ]]>
+	</sql-query>
+	
+	
+
+</hibernate-mapping>

@@ -1,0 +1,22 @@
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:a4j="http://richfaces.org/a4j">
+	
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta content="no-cache" http-equiv="Pragma"/>
+	<meta content="no-cache" http-equiv="Cache-Control"/>
+	<meta content="no-store" http-equiv="Cache-Control"/>
+	<meta content="max-age=0" http-equiv="Cache-Control"/>
+	<meta content="1" http-equiv="Expires"/>
+
+	<a4j:region id="regiaoBarraSuperior" renderRegionOnly="true">
+	
+		<ui:include src="/WEB-INF/templates/loading.xhtml" />
+	
+		<div id="barraMenu" >
+			<ui:include src="/WEB-INF/templates/menu.xhtml" />
+		</div>
+	</a4j:region>
+</ui:composition>

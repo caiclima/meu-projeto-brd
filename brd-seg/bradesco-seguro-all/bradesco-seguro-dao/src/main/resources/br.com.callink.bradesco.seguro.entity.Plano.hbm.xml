@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<query name="Plano.buscarPlanoPorProduto">
+		<![CDATA[
+			SELECT plano 
+			FROM Plano AS plano
+	 	      	INNER JOIN FETCH plano.produto AS produto 
+			WHERE plano.produto.id = :idProduto AND plano.flagEnabled = :flagEnabled AND plano.flagRemoved = :flagRemoved
+			AND plano.dataInicioVigencia <= :dataAtual AND (plano.dataFinalVigencia is NULL OR plano.dataFinalVigencia >= :dataAtual)
+        ]]>
+	</query>
+	
+	<query name="Plano.buscarPlanoPorProdutoAndIdade">
+		<![CDATA[
+			SELECT plano 
+			FROM Plano AS plano
+	 	      	INNER JOIN FETCH plano.produto AS produto 
+			WHERE plano.produto.id = :idProduto AND :idade >= CONVERT(INT, plano.faixaEtariaInicial) AND :idade <= CONVERT(INT, plano.faixaEtariaFinal) 
+				 AND plano.flagEnabled = :flagEnabled AND plano.flagRemoved = :flagRemoved 
+				 AND plano.dataInicioVigencia <= :dataAtual AND (plano.dataFinalVigencia is NULL OR plano.dataFinalVigencia >= :dataAtual)
+        ]]>
+	</query>
+	
+	<query name="Plano.buscarCodigoExistente">
+		<![CDATA[
+			SELECT count(plano) 
+			FROM Plano AS plano
+			WHERE plano.id <> :idPlano and plano.codigo = :codigoPlano 
+        ]]>
+	</query>
+
+</hibernate-mapping>

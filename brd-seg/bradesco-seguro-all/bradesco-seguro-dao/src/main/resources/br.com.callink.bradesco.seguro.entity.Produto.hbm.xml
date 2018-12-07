@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	
+	<query name="Produto.buscarProdutoNoEvento">
+		<![CDATA[
+		SELECT produto 
+		    FROM Produto AS produto
+		        INNER JOIN FETCH produto.produtoEventoList AS produtoEvento 
+		        INNER JOIN FETCH produtoEvento.evento AS evento 
+		    WHERE produto.flagEnabled = :eventoFlagEnabled 
+		        AND evento.id = :idEvento 
+		    ORDER BY produto.descricao
+        ]]>
+	</query>
+	
+</hibernate-mapping>
